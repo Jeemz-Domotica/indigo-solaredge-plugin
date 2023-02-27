@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<Devices>
+        <Device type="custom" id="site">
+        <Name>Inverter</Name>
+        <ConfigUI>
+            <Field id="deviceId" type="textfield">
+                <Label>Device Id: </Label>
+            </Field>
+        </ConfigUI>
+
+        <States>
+            <State id="name">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Site name</TriggerLabel>
+                <ControlPageLabel>Site name</ControlPageLabel>
+            </State>
+            <State id="location">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Location</TriggerLabel>
+                <ControlPageLabel>Location</ControlPageLabel>
+            </State>
+            <State id="installationDate">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Installation Date</TriggerLabel>
+                <ControlPageLabel>Installation Date</ControlPageLabel>
+            </State>
+            <State id="siteId">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Site Id</TriggerLabel>
+                <ControlPageLabel>Site Id</ControlPageLabel>
+            </State>
+        </States>
+    </Device>
+
+    <Device type="custom" id="inverter">
+        <Name>Inverter</Name>
+        <ConfigUI>
+            <Field id="deviceId" type="textfield">
+                <Label>Device Id: </Label>
+            </Field>
+        </ConfigUI>
+        
+        <States>
+            <State id="name">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Inverter/SMI name</TriggerLabel>
+                <ControlPageLabel>Inverter/SMI name</ControlPageLabel>
+            </State>
+            <State id="manufacturer">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Manufacturer</TriggerLabel>
+                <ControlPageLabel>Manufacturer</ControlPageLabel>
+            </State>
+            <State id="model">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Model</TriggerLabel>
+                <ControlPageLabel>Model</ControlPageLabel>
+            </State>
+            <State id="serialNumber">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Serial Number</TriggerLabel>
+                <ControlPageLabel>Serial Number</ControlPageLabel>
+            </State>
+        </States>
+    </Device>
+
+    <Device type="custom" id="battery">
+        <Name>Battery</Name>
+        <ConfigUI>
+            <Field id="deviceId" type="textfield">
+                <Label>Device Id: </Label>
+            </Field>
+        </ConfigUI>
+
+        <States>
+            <State id="nameplate">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Nameplate</TriggerLabel>
+                <ControlPageLabel>Nameplate</ControlPageLabel>
+            </State>
+            <State id="modelNumber">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Model Number</TriggerLabel>
+                <ControlPageLabel>Model Number</ControlPageLabel>
+            </State>
+            <State id="serialNumber">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Serial Number</TriggerLabel>
+                <ControlPageLabel>Serial Number</ControlPageLabel>
+            </State>
+            <State id="telemetries">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Telemetries</TriggerLabel>
+                <ControlPageLabel>Telemetries</ControlPageLabel>
+            </State>
+
+        </States>
+    </Device>
+</Devices>

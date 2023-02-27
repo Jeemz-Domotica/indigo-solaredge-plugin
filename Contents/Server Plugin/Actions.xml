@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<Actions>
+    <SupportURL>http://www.jeemz.tech/helvar-connector/pluginActions.html</SupportURL>
+
+    <Action id="site-power-flow">
+        <Name>Control Mode</Name>
+        <ConfigUI>
+            <Field id="site" type="menu">
+                <Label>Sites List:</Label>
+                <List class="indigo.devices" filter="self.site"/>
+            </Field>
+        </ConfigUI>
+        <CallbackMethod>req_site_power_flow</CallbackMethod>
+    </Action>
+
+    <Action id="getDevice">
+        <Name>Show Thermostat Settings</Name>
+        <ConfigUI>
+            <Field id="thermostatList" type="menu">
+                <Label>Thermostat List:</Label>
+                <List class="indigo.devices" filter="self.myThermostat"/>
+            </Field>
+            <Field id="GETdevice"
+                    type="button"
+                    tooltip="Show Current Thermostat Info">
+
+                <Label>Show Thermostat Setting</Label>
+                <Title>Show</Title>
+                <CallbackMethod>get_device</CallbackMethod>
+            </Field>
+
+        </ConfigUI>
+        <CallbackMethod>get_device_request</CallbackMethod>
+    </Action>
+
+
+    <Action id="postStatusHeatSetPoint">
+        <Name>Post thermostat status</Name>
+        <ConfigUI>
+            <Field id="thermostatList" type="menu">
+                <Label>Thermostat List:</Label>
+                <List class="indigo.devices" filter="self.myThermostat"/>
+            </Field>
+            <Field id="status" type="textfield">
+                <Label>Status:</Label>
+            </Field>
+        </ConfigUI>
+        <CallbackMethod>select_status_heat_setpoint</CallbackMethod>
+    </Action>
+
+    <Action id="bulkPostHeatSetpoint">
+        <Name>Bulk Control Heat SetPoint</Name>
+        <ConfigUI>
+
+            <Field id="thermostatList" type="menu">
+                <Label>Thermostat List:</Label>
+                <List class="indigo.devices" filter="self.myThermostat"/>
+            </Field>
+            <Field type="list" id="POSTstatusHeat">
+                <Label>Status Heat Setpoint</Label>
+                    <List>
+                            <Option value="scheduled">Scheduled</Option>
+                            <Option value="temporary">Temporary</Option>
+                            <Option value="hold">Hold</Option>
+                            <Option value="vacationHold">VacationHold</Option>
+                    </List>
+                </Field>
+
+            <Field id="POSTtemperatureHeat"
+                        type="textfield"
+                        >
+                        <Label>Threshold Heat Value:</Label>
+                        <CallbackMethod>bulk_set_heat_setpoint</CallbackMethod>
+            </Field>
+        </ConfigUI>
+        <CallbackMethod>bulk_set_heat_setpoint</CallbackMethod>
+    </Action>
+
+        <Action id="postHeatSetpoint">
+            <Name>Control Heat SetPoint</Name>
+            <ConfigUI>
+            <Field id="thermostatList" type="menu">
+                <Label>Thermostat List:</Label>
+                <List class="indigo.devices" filter="self.myThermostat"/>
+            </Field>
+            <Field id="sendHeatSetPoint"
+                    type="button"
+                    tooltip="Click this button to update themrostat">
+                <Label>Update Thermostat</Label>
+                <Title>Send</Title>
+                <CallbackMethod>set_heat_setpoint</CallbackMethod>
+            </Field>
+        </ConfigUI>
+        <CallbackMethod>set_heat_setpoint</CallbackMethod>
+    </Action>
+
+    <Action id="increaseHeatSetPoint">
+        <Name>Incease Heat Set Point by 0.5</Name>
+        <ConfigUI>
+        <Field id="thermostatList" type="menu">
+                <Label>Thermostat List:</Label>
+                <List class="indigo.devices" filter="self.myThermostat"/>
+            </Field>
+            <Field id="increaseHeatSetPoint"
+                        type="button"                        >
+                        <Label>+0.5</Label>
+                        <Title>Increase Heat Set Point</Title>
+                        <CallbackMethod>increase_heat_setpoint</CallbackMethod>
+            </Field>
+            </ConfigUI>
+            <CallbackMethod>increase_heat_setpoint</CallbackMethod>
+    </Action>
+
+    <Action id="decreaseHeatSetPoint">
+        <Name>Decrease Heat Set Point by 0.5</Name>
+        <ConfigUI>
+        <Field id="thermostatList" type="menu">
+                <Label>Thermostat List:</Label>
+                <List class="indigo.devices" filter="self.myThermostat"/>
+            </Field>
+            <Field id="decreaseHeatSetPoint"
+                        type="button"                        >
+                        <Label>-0.5</Label>
+                        <Title>decrease Heat Set Point</Title>
+                        <CallbackMethod>decrease_heat_setpoint</CallbackMethod>
+            </Field>
+            </ConfigUI>
+            <CallbackMethod>decrease_heat_setpoint</CallbackMethod>
+    </Action>
+
+</Actions>
