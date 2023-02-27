@@ -1,0 +1,1 @@
+# indigo-solaredge-plugin
