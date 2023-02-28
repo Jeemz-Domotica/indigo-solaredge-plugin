@@ -185,6 +185,11 @@ class Plugin(indigo.PluginBase):
         battery.updateStateOnServer(newData)
 
     def req_site_power_flow(self, siteId):
+        '''
+        API request. Retrieves the power flow
+        :param siteId:
+        :return:
+        '''
         apikey = self.get_apikey()
         endpoint = 'site/'+siteId+'currentPowerFlow?api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
@@ -195,6 +200,12 @@ class Plugin(indigo.PluginBase):
         return response
 
     def update_inverter_data_by_serialNumber(self, action, inverter_serialNumber):
+        '''
+        Helpter function. Updates the inverter device with new data by serialNumber
+        :param action:
+        :param inverter_serialNumber:
+        :return:
+        '''
         #  Inverter Technical Data: Description: Return specific inverter data for a given timeframe
         # URL: /equipment/{siteId} /{serialNumber}/data
         apikey = self.get_apikey()
@@ -231,6 +242,13 @@ class Plugin(indigo.PluginBase):
         return response
 
     def req_inverter_data_by_serialNumber(self, action, typeId, devId):
+        '''
+        Indigo Action. Updates the inverter object with the serialNumber with new data
+        :param action:
+        :param typeId:
+        :param devId:
+        :return:
+        '''
         inverter_serialNumber = self.get_serialNumber(devId)
         self.update_inverter_data_by_serialNumber(action, inverter_serialNumber)
 
@@ -362,6 +380,11 @@ class Plugin(indigo.PluginBase):
     # initializes one node which is registered in Velux
     # runs only when indigo plugin is configured
     def init_site(self, node):
+        '''
+        Initialize a dictionary for the site device object
+        :param node:
+        :return:
+        '''
         indigo.server.log(str(node))
         device = {}
         device['device'] = {}
@@ -373,6 +396,11 @@ class Plugin(indigo.PluginBase):
         return device
 
     def create_site_device(self, site):
+        '''
+        Create the device site object in indigo with the initialized data
+        :param site:
+        :return:
+        '''
         try:
             created_device = indigo.device.create(
                 protocol=indigo.kProtocol.Plugin,
@@ -386,6 +414,12 @@ class Plugin(indigo.PluginBase):
             indigo.server.log("Device already exist. Continue.")
 
     def init_inverter(self, node, siteId):
+        '''
+        Initialize the inverter object device with the data retrieved from the api
+        :param node:
+        :param siteId:
+        :return:
+        '''
         indigo.server.log(str(node))
         device = {}
         device['device'] = {}
@@ -398,6 +432,11 @@ class Plugin(indigo.PluginBase):
         return device
 
     def create_inverter_device(self, inverter):
+        '''
+        Create the initialized inverter device
+        :param inverter:
+        :return:
+        '''
         try:
             created_device = indigo.device.create(
                 protocol=indigo.kProtocol.Plugin,
@@ -411,6 +450,12 @@ class Plugin(indigo.PluginBase):
             indigo.server.log("Device already exist. Continue.")
 
     def init_battery(self, node, siteId):
+        '''
+        Initialize the battery device object with the new data
+        :param node:
+        :param siteId:
+        :return:
+        '''
         indigo.server.log(str(node))
         device = {}
         device['device'] = {}
@@ -422,6 +467,11 @@ class Plugin(indigo.PluginBase):
         return device
 
     def create_battery_device(self, battery):
+        '''
+        Create the battery device in indigo
+        :param battery:
+        :return:
+        '''
         try:
             created_device = indigo.device.create(
                 protocol=indigo.kProtocol.Plugin,
@@ -436,6 +486,10 @@ class Plugin(indigo.PluginBase):
 
 
     def req_all_sites(self):
+        '''
+        Retrieve all the sites from the api
+        :return:
+        '''
         apikey = self.get_apikey()
         endpoint = 'sites/list?api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
@@ -443,6 +497,11 @@ class Plugin(indigo.PluginBase):
         return response
 
     def req_all_inverters(self, siteId):
+        '''
+        Retrieve all the inverters from the api
+        :param siteId:
+        :return:
+        '''
         apikey = self.get_apikey()
         endpoint = '/equipment/'+siteId+'/list?api_key='+apikey
         response = requests.get(MY_API_HOST + endpoint)
@@ -450,6 +509,13 @@ class Plugin(indigo.PluginBase):
         return response
 
     def req_all_batteries(self, siteId, timeUnit = None, time = None):
+        '''
+        Retrieve all the batteries from the api
+        :param siteId:
+        :param timeUnit:
+        :param time:
+        :return:
+        '''
         apikey = self.get_apikey()
         now = datetime.datetime.now()
         endTime = now.strftime("%d/%m/%Y+%H:%M:%S")
@@ -473,6 +539,10 @@ class Plugin(indigo.PluginBase):
 
     # initialize all nodes (blinders) registered with Velux on indigo config of password and ip of Velux
     def initialize_devices(self):
+        '''
+        This function is only called to automatically create new devices with a Solaredge account
+        :return:
+        '''
         sites = []
         try:
             response = self.req_all_sites()
