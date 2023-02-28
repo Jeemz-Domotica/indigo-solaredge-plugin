@@ -3,9 +3,9 @@
     <SupportURL>http://www.jeemz.tech/helvar-connector/pluginActions.html</SupportURL>
 
     <Action id="site-power-flow">
-        <Name>Control Mode</Name>
+        <Name>Site Power Flow</Name>
         <ConfigUI>
-            <Field id="site" type="menu">
+            <Field id="siteId" type="menu">
                 <Label>Sites List:</Label>
                 <List class="indigo.devices" filter="self.site"/>
             </Field>
@@ -13,119 +13,115 @@
         <CallbackMethod>req_site_power_flow</CallbackMethod>
     </Action>
 
-    <Action id="getDevice">
-        <Name>Show Thermostat Settings</Name>
+    <Action id="inverter_data_by_serialNumber">
+        <Name>Inverter Data</Name>
         <ConfigUI>
-            <Field id="thermostatList" type="menu">
-                <Label>Thermostat List:</Label>
-                <List class="indigo.devices" filter="self.myThermostat"/>
+            <Field id="inverter" type="menu">
+                <Label>Inverters List:</Label>
+                <List class="indigo.devices" filter="self.inverter"/>
             </Field>
-            <Field id="GETdevice"
-                    type="button"
-                    tooltip="Show Current Thermostat Info">
-
-                <Label>Show Thermostat Setting</Label>
-                <Title>Show</Title>
-                <CallbackMethod>get_device</CallbackMethod>
-            </Field>
-
-        </ConfigUI>
-        <CallbackMethod>get_device_request</CallbackMethod>
-    </Action>
-
-
-    <Action id="postStatusHeatSetPoint">
-        <Name>Post thermostat status</Name>
-        <ConfigUI>
-            <Field id="thermostatList" type="menu">
-                <Label>Thermostat List:</Label>
-                <List class="indigo.devices" filter="self.myThermostat"/>
-            </Field>
-            <Field id="status" type="textfield">
-                <Label>Status:</Label>
-            </Field>
-        </ConfigUI>
-        <CallbackMethod>select_status_heat_setpoint</CallbackMethod>
-    </Action>
-
-    <Action id="bulkPostHeatSetpoint">
-        <Name>Bulk Control Heat SetPoint</Name>
-        <ConfigUI>
-
-            <Field id="thermostatList" type="menu">
-                <Label>Thermostat List:</Label>
-                <List class="indigo.devices" filter="self.myThermostat"/>
-            </Field>
-            <Field type="list" id="POSTstatusHeat">
-                <Label>Status Heat Setpoint</Label>
+            <Field type="list" id="timeUnit">
+                <Label>Time Unit</Label>
                     <List>
-                            <Option value="scheduled">Scheduled</Option>
-                            <Option value="temporary">Temporary</Option>
-                            <Option value="hold">Hold</Option>
-                            <Option value="vacationHold">VacationHold</Option>
+                        <Option value="MINUTES">MINUTES</Option>
+                        <Option value="HOUR">HOUR</Option>
+                        <Option value="DAY">DAY</Option>
+                    </List>
+            </Field>
+            <Field id="time" type="textfield">
+                <Label>Time Range for the selected time unit:</Label>
+            </Field>
+        </ConfigUI>
+        <CallbackMethod>req_inverter_data_by_serialNumber</CallbackMethod>
+    </Action>
+
+    <Action id="site_energy">
+        <Name>Site Energy</Name>
+        <ConfigUI>
+            <Field id="siteId" type="menu">
+                <Label>Sites List:</Label>
+                <List class="indigo.devices" filter="self.site"/>
+            </Field>
+            <Field type="list" id="time">
+                <Label>Time Range</Label>
+                    <List>
+                        <Option value="QUARTER_OF_AN_HOUR">QUARTER OF AN HOUR</Option>
+                        <Option value="HOUR">HOUR</Option>
+                        <Option value="DAY">DAY</Option>
+                        <Option value="WEEK">WEEK</Option>
+                        <Option value="MONTH">MONTH</Option>
+                        <Option value="YEAR">YEAR</Option>
                     </List>
                 </Field>
+        </ConfigUI>
+        <CallbackMethod>req_site_energy</CallbackMethod>
+    </Action>
 
-            <Field id="POSTtemperatureHeat"
-                        type="textfield"
-                        >
-                        <Label>Threshold Heat Value:</Label>
-                        <CallbackMethod>bulk_set_heat_setpoint</CallbackMethod>
+    <Action id="site_power">
+        <Name>Site Power</Name>
+        <ConfigUI>
+            <Field id="siteId" type="menu">
+                <Label>Sites List:</Label>
+                <List class="indigo.devices" filter="self.site"/>
+            </Field>
+            <Field type="list" id="timeUnit">
+                <Label>Time Unit</Label>
+                    <List>
+                        <Option value="MINUTES">MINUTES</Option>
+                        <Option value="HOUR">HOUR</Option>
+                        <Option value="DAY">DAY</Option>
+                        <Option value="WEEK">WEEK</Option>
+                    </List>
+            </Field>
+            <Field id="time" type="textfield">
+                <Label>Time Range for the selected time unit:</Label>
             </Field>
         </ConfigUI>
-        <CallbackMethod>bulk_set_heat_setpoint</CallbackMethod>
+        <CallbackMethod>req_site_power</CallbackMethod>
     </Action>
 
-        <Action id="postHeatSetpoint">
-            <Name>Control Heat SetPoint</Name>
-            <ConfigUI>
-            <Field id="thermostatList" type="menu">
-                <Label>Thermostat List:</Label>
-                <List class="indigo.devices" filter="self.myThermostat"/>
+    <Action id="update-batteries">
+        <Name>Get all batteries data by site</Name>
+        <ConfigUI>
+            <Field id="siteId" type="menu">
+                <Label>Sites List:</Label>
+                <List class="indigo.devices" filter="self.site"/>
             </Field>
-            <Field id="sendHeatSetPoint"
-                    type="button"
-                    tooltip="Click this button to update themrostat">
-                <Label>Update Thermostat</Label>
-                <Title>Send</Title>
-                <CallbackMethod>set_heat_setpoint</CallbackMethod>
+            <Field type="list" id="timeUnit">
+                <Label>Time Unit</Label>
+                    <List>
+                        <Option value="MINUTES">MINUTES</Option>
+                        <Option value="HOUR">HOUR</Option>
+                        <Option value="DAY">DAY</Option>
+                    </List>
+            </Field>
+            <Field id="time" type="textfield">
+                <Label>Time Range for the selected time unit:</Label>
             </Field>
         </ConfigUI>
-        <CallbackMethod>set_heat_setpoint</CallbackMethod>
+        <CallbackMethod>req_update_all_batteries</CallbackMethod>
     </Action>
 
-    <Action id="increaseHeatSetPoint">
-        <Name>Incease Heat Set Point by 0.5</Name>
+    <Action id="update-inverters">
+        <Name>Get all inverters data by site</Name>
         <ConfigUI>
-        <Field id="thermostatList" type="menu">
-                <Label>Thermostat List:</Label>
-                <List class="indigo.devices" filter="self.myThermostat"/>
+            <Field id="siteId" type="menu">
+                <Label>Sites List:</Label>
+                <List class="indigo.devices" filter="self.site"/>
             </Field>
-            <Field id="increaseHeatSetPoint"
-                        type="button"                        >
-                        <Label>+0.5</Label>
-                        <Title>Increase Heat Set Point</Title>
-                        <CallbackMethod>increase_heat_setpoint</CallbackMethod>
+            <Field type="list" id="timeUnit">
+                <Label>Time Unit</Label>
+                    <List>
+                        <Option value="MINUTES">MINUTES</Option>
+                        <Option value="HOUR">HOUR</Option>
+                        <Option value="DAY">DAY</Option>
+                    </List>
             </Field>
-            </ConfigUI>
-            <CallbackMethod>increase_heat_setpoint</CallbackMethod>
-    </Action>
-
-    <Action id="decreaseHeatSetPoint">
-        <Name>Decrease Heat Set Point by 0.5</Name>
-        <ConfigUI>
-        <Field id="thermostatList" type="menu">
-                <Label>Thermostat List:</Label>
-                <List class="indigo.devices" filter="self.myThermostat"/>
+            <Field id="time" type="textfield">
+                <Label>Time Range for the selected time unit:</Label>
             </Field>
-            <Field id="decreaseHeatSetPoint"
-                        type="button"                        >
-                        <Label>-0.5</Label>
-                        <Title>decrease Heat Set Point</Title>
-                        <CallbackMethod>decrease_heat_setpoint</CallbackMethod>
-            </Field>
-            </ConfigUI>
-            <CallbackMethod>decrease_heat_setpoint</CallbackMethod>
+        </ConfigUI>
+        <CallbackMethod>req_update_all_inverters</CallbackMethod>
     </Action>
 
 </Actions>

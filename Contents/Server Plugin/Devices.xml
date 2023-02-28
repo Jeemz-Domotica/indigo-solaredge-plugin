@@ -3,8 +3,8 @@
         <Device type="custom" id="site">
         <Name>Inverter</Name>
         <ConfigUI>
-            <Field id="deviceId" type="textfield">
-                <Label>Device Id: </Label>
+            <Field id="siteId" type="textfield">
+                <Label>Site Id: </Label>
             </Field>
         </ConfigUI>
 
@@ -24,19 +24,14 @@
                 <TriggerLabel>Installation Date</TriggerLabel>
                 <ControlPageLabel>Installation Date</ControlPageLabel>
             </State>
-            <State id="siteId">
-                <ValueType>Number</ValueType>
-                <TriggerLabel>Site Id</TriggerLabel>
-                <ControlPageLabel>Site Id</ControlPageLabel>
-            </State>
         </States>
     </Device>
 
     <Device type="custom" id="inverter">
         <Name>Inverter</Name>
         <ConfigUI>
-            <Field id="deviceId" type="textfield">
-                <Label>Device Id: </Label>
+            <Field id="serialNumber" type="textfield">
+                <Label>Serial Number: </Label>
             </Field>
         </ConfigUI>
         
@@ -56,10 +51,10 @@
                 <TriggerLabel>Model</TriggerLabel>
                 <ControlPageLabel>Model</ControlPageLabel>
             </State>
-            <State id="serialNumber">
+            <State id="siteId">
                 <ValueType>Number</ValueType>
-                <TriggerLabel>Serial Number</TriggerLabel>
-                <ControlPageLabel>Serial Number</ControlPageLabel>
+                <TriggerLabel>Site Id</TriggerLabel>
+                <ControlPageLabel>Site Id</ControlPageLabel>
             </State>
         </States>
     </Device>
@@ -67,8 +62,8 @@
     <Device type="custom" id="battery">
         <Name>Battery</Name>
         <ConfigUI>
-            <Field id="deviceId" type="textfield">
-                <Label>Device Id: </Label>
+            <Field id="serialNumber" type="textfield">
+                <Label>Serial Number: </Label>
             </Field>
         </ConfigUI>
 
@@ -83,15 +78,15 @@
                 <TriggerLabel>Model Number</TriggerLabel>
                 <ControlPageLabel>Model Number</ControlPageLabel>
             </State>
-            <State id="serialNumber">
-                <ValueType>Number</ValueType>
-                <TriggerLabel>Serial Number</TriggerLabel>
-                <ControlPageLabel>Serial Number</ControlPageLabel>
-            </State>
             <State id="telemetries">
                 <ValueType>String</ValueType>
                 <TriggerLabel>Telemetries</TriggerLabel>
                 <ControlPageLabel>Telemetries</ControlPageLabel>
+            </State>
+            <State id="siteId">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Site Id</TriggerLabel>
+                <ControlPageLabel>Site Id</ControlPageLabel>
             </State>
 
         </States>

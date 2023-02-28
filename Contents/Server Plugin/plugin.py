@@ -1,6 +1,9 @@
 import indigo
 from Queue import Queue
 import requests
+import datetime
+import pandas as pd
+import csv
 # import validation later
 
 MY_API_HOST = 'https://monitoringapi.solaredge.com/'
@@ -37,56 +40,42 @@ class Plugin(indigo.PluginBase):
 
     
     def closedPrefsConfigUi(self, valuesDict, userCancelled):
-        indigo.server.log(str(valuesDict.get("apikey", "")))
+        apikey = valuesDict.get('apikey')
+        # device.ownerProps
+        self.initialize_devices()
     #     automatically init the sites on the account
 
-    def closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):
-        """
-        Called when device config is closed, used for saving states.
-        :param valuesDict: indigo.Dict containing the key-value pairs of the menu items, as specified in Devices.xml
-        :param userCancelled: Boolean telling if the menu was saved by user or not.
-        :param typeId: device type identifier, as specified in Devices.xml
-        :param devId: device id, unique per device.
-        :return: True
-        """
-        indigo.server.log(str(valuesDict.get('deviceId', "")))
-        device = indigo.devices[devId]
-        indigo.server.log("VERIFY STATE IN CONFIG UI CLOSED %s" % valuesDict)
-        if not userCancelled and typeId == 'myThermostat':
-            device = indigo.devices[devId]
-            thermostat_id = safe_dict_retrieval(valuesDict, 'deviceId')
-            indigo.server.log("thermostat id %s" % thermostat_id )
-
-            # Update device in the environment
-            props_copy = device.pluginProps
-            indigo.server.log("PROPS COPY")
-            indigo.server.log(str(props_copy))
-            indigo.server.log("props copy before deviceId %s" % props_copy['deviceId'] )
-            props_copy['deviceId'] = thermostat_id
-            indigo.server.log("props copy after deviceId %s" % props_copy['deviceId'] )
-            device.replacePluginPropsOnServer(props_copy)
-
-            # Update device states on Server - triggers deviceUpdated() method
-            # device.updateStateOnServer(states_copy)
-
-
-        return True
-
-
-    def get_device_fan(self, valuesDict, typeId, devId):
-        """
-        Callback command for the httpRequest Indigo Action
-        Calls the Request for the user input action
-        :param action: indigo.Dict object containing action params
-        """
-        indigo.server.log("GET DEVICE FAN   ")
-        # do whatever you need to here
-    #   typeId is the device type specified in the Devices.xml
-    #   devId is the device ID - 0 if it's a new device
-        indigo.server.log( "valuesDict thermostatList selected%s" % valuesDict['thermostatList'])
-        indigo.server.log("typeId %s" % typeId)
-        indigo.server.log("devId %s" % devId)
-        selected_device = indigo.devices[int(valuesDict['thermostatList'])]
+    # def closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):
+    #     """
+    #     Called when device config is closed, used for saving states.
+    #     :param valuesDict: indigo.Dict containing the key-value pairs of the menu items, as specified in Devices.xml
+    #     :param userCancelled: Boolean telling if the menu was saved by user or not.
+    #     :param typeId: device type identifier, as specified in Devices.xml
+    #     :param devId: device id, unique per device.
+    #     :return: True
+    #     """
+    #     indigo.server.log(str(valuesDict.get('deviceId', "")))
+    #     device = indigo.devices[devId]
+    #     indigo.server.log("VERIFY STATE IN CONFIG UI CLOSED %s" % valuesDict)
+    #     if not userCancelled and typeId == 'myThermostat':
+    #         device = indigo.devices[devId]
+    #         thermostat_id = safe_dict_retrieval(valuesDict, 'deviceId')
+    #         indigo.server.log("thermostat id %s" % thermostat_id )
+    #
+    #         # Update device in the environment
+    #         props_copy = device.pluginProps
+    #         indigo.server.log("PROPS COPY")
+    #         indigo.server.log(str(props_copy))
+    #         indigo.server.log("props copy before deviceId %s" % props_copy['deviceId'] )
+    #         props_copy['deviceId'] = thermostat_id
+    #         indigo.server.log("props copy after deviceId %s" % props_copy['deviceId'] )
+    #         device.replacePluginPropsOnServer(props_copy)
+    #
+    #         # Update device states on Server - triggers deviceUpdated() method
+    #         # device.updateStateOnServer(states_copy)
+    #
+    #
+    #     return True
 
     def validateActionConfigUi(self, valuesDict, typeId, deviceId):
         """
@@ -163,27 +152,212 @@ class Plugin(indigo.PluginBase):
         
    
         return (True, valuesDict)
-        
 
+        # getter for the device id
 
-        
-    def send_http_request(self, action, typeId, devId):
-        """
-        Callback command for the httpRequest Indigo Action
-        Calls the Request for the user input action
-        :param action: indigo.Dict object containing action params
-        """
-        indigo.server.log("ACTION PROPS")
-        indigo.server.log(str(action))
-        indigo.server.log(str(typeId))
-        indigo.server.log(str(devId))
+    def get_serialNumber(self, devId):
+        device = indigo.devices[int(devId)]
+        device_id = device.pluginProps["serialNumber"]
+        return device_id
 
-    def site_power_flow(self, siteId):
+    def get_device(self, devId):
+        device = indigo.devices[devId]
+        return device
+
+    def get_siteId(self, devId):
+        device = indigo.devices[devId]
+        siteId = device.pluginProps.get("siteId")
+        if siteId == None:
+            siteId = device.states.get("siteId")
+        return siteId
+
+    def get_apikey(self):
+        apikey = indigo.pluginProps.get("apikey")
+        return apikey
+
+    def update_inverter(self, newData, inverter):
+        inverter.updateStateOnServer(newData)
+
+    def update_site(self, newData, site):
+        site.updateStateOnServer(newData)
+
+    def update_battery(self, newData, battery):
+        battery.updateStateOnServer(newData)
+
+    def req_site_power_flow(self, siteId):
+        apikey = self.get_apikey()
         endpoint = 'site/'+siteId+'currentPowerFlow?api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         response = requests.get(MY_API_HOST + endpoint)
-        indigo.server.log(str(response.json()))
+        indigo.server.log(str(response))
+        response = response.json()
+        indigo.server.log(str(response))
         return response
+
+    def update_inverter_data_by_serialNumber(self, action, inverter_serialNumber):
+        #  Inverter Technical Data: Description: Return specific inverter data for a given timeframe
+        # URL: /equipment/{siteId} /{serialNumber}/data
+        apikey = self.get_apikey()
+        indigo.server.log("REQ INVERTER DATA")
+        inverter = self.get_device(int(inverter_serialNumber))
+        siteId = self.get_siteId(int(inverter_serialNumber))
+        timeUnit = action.props.get('timeUnit')
+        time = action.props.get('time')
+        now = datetime.datetime.now()
+        endTime = now.strftime("%d/%m/%Y+%H:%M:%S")
+        if timeUnit or time == None:
+            startTime = now - datetime.timedelta(weeks=1)
+        else:
+            if timeUnit == 'MINUTES':
+                startTime = now - datetime.timedelta(minutes=time)
+            elif timeUnit == 'HOUR':
+                startTime = now - datetime.timedelta(hours=time)
+            elif timeUnit == 'DAY':
+                if time <= 7:
+                    startTime = now - datetime.timedelta(days=time)
+                else:
+                    startTime = now - datetime.timedelta(days=7)
+        startTime = startTime.strftime("%d/%m/%Y+%H:%M:%S")
+        endpoint = 'equipment/' + siteId + '/' + inverter_serialNumber + '/data?startTime='+startTime+ '&endTime=' + endTime +'&api_key=' + apikey
+        indigo.server.log(str(MY_API_HOST + endpoint))
+        response = requests.get(MY_API_HOST + endpoint)
+        indigo.server.log(str(response))
+        response = response.json()
+        indigo.server.log(str(response))
+        # update states of the inverter with new data
+        newData = response["data"]["telemetries"]
+        self.update_inverter(newData, inverter)
+
+        return response
+
+    def req_inverter_data_by_serialNumber(self, action, typeId, devId):
+        inverter_serialNumber = self.get_serialNumber(devId)
+        self.update_inverter_data_by_serialNumber(action, inverter_serialNumber)
+
+    def req_update_all_inverters(self, action, typeId, devId):
+        '''
+        Calls the request to get all inverters and updates with the new data the
+        state of the already created inverter devices
+        :param action:
+        :param typeId:
+        :param devId:
+        :return:
+        '''
+        siteId = self.get_siteId(int(devId))
+        # define timeunit and time
+        # for each inverter device
+        #  gets the new inverter timeseries data
+        inverters_devices = indigo.devices.deviceTypeId['inverter']
+        for inverter in inverters_devices:
+            #  get devId of the inverter device
+            inverter_serialNumber = inverter.props.get("serialNumber")
+            self.update_inverter_data_by_serialNumber(action, inverter_serialNumber)
+
+
+    def req_update_all_batteries(self, action, typeId, devId):
+        '''
+        Calls the request to get all the batteries and updates with the new data the
+        existing battery devices
+        :param action:
+        :param typeId:
+        :param devId:
+        :return:
+        '''
+
+        siteId = self.get_siteId(int(devId))
+        # define timeunit and time
+        timeUnit = action.props.get('timeUnit')
+        time = action.props.get('time')
+        #  gets the new battery timeseries data
+        response = self.req_all_batteries(siteId, timeUnit, time)
+        batteries_json = response.json()
+        batteries = batteries_json["storageData"]["batteries"]
+        indigo.server.log(str(batteries))
+        # now get all the battery devices and their serialNumber
+        batteries_devices = indigo.devices.deviceTypeId['battery']
+        # correlate the battery data with the serial number of the battery devices
+        # and update the state of the battery device with the new data correlated with its id
+        for battery_device in batteries_devices:
+            for battery_data in batteries:
+                if battery_data["serialNumber"] == battery_device.props.get("serialNumber"):
+                    self.update_battery(battery_data, battery_device)
+
+
+    def req_site_energy(self, action, typeId, devId):
+        '''
+        Site Energy - Detailed:
+        Description: Detailed site energy measurements from meters such as consumption, export (feed-in), import (purchase), etc.
+        Note: Calculated meter readings (also referred to as "virtual meters"), such as self-consumption, are calculated
+        using the data measured by the meter and the inverters.
+        URL:/site/{siteId}/energyDetails
+        # &timeUnit=DAY
+        '''
+        indigo.server.log("REQ SITE ENERGY DATA")
+        apikey = self.get_apikey()
+        siteId = self.get_siteId(devId)
+        time = action.props.get('time')
+        indigo.server.log(str(time))
+        endpoint = 'site/' + siteId + '/energyDetails?timeUnit='+ time +'&api_key=' + apikey
+        indigo.server.log(str(MY_API_HOST + endpoint))
+        response = requests.get(MY_API_HOST + endpoint)
+        indigo.server.log(str(response))
+        response = response.json()
+        indigo.server.log(str(response))
+        return response
+
+    def req_site_power(self, action, typeId, devId):
+        '''
+        Description: Detailed site power measurements from meters such as consumption, export (feed-in), import (purchase),
+        Note: Calculated meter readings (also referred to as "virtual meters"), such as self-consumption, are calculated
+        using the data measured by the meter and the inverters.
+        URL: /site/{siteId}/powerDetails
+        :param action:
+        :param typeId:
+        :param devId:
+        :return:
+        '''
+        apikey = self.get_apikey()
+        indigo.server.log("REQ SITE POWER DATA")
+        siteId = self.get_siteId(devId)
+        # time in hours
+        timeUnit = action.props.get('timeUnit')
+        time = action.props.get('time')
+        now = datetime.datetime.now()
+        endTime = now.strftime("%d/%m/%Y+%H:%M:%S")
+        if timeUnit == 'MINUTES':
+            startTime = now - datetime.timedelta(minutes=time)
+        elif timeUnit == 'HOUR':
+            startTime = now - datetime.timedelta(hours=time)
+        elif timeUnit == 'DAY':
+            startTime = now - datetime.timedelta(days=time)
+        elif timeUnit == 'WEEK':
+            startTime = now - datetime.timedelta(weeks=time)
+        startTime = startTime.strftime("%d/%m/%Y+%H:%M:%S")
+        endpoint = 'site/' + siteId + '/powerDetails' + '?startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
+        indigo.server.log(str(MY_API_HOST + endpoint))
+        response = requests.get(MY_API_HOST + endpoint)
+        indigo.server.log(str(response))
+        data = response.json()
+        indigo.server.log(str(response))
+        df = pd.json_normalize(data["powerDetails"], record_path=['meters'])
+        print(df.head())
+        df.to_csv()
+        return response
+
+    def req_site_data(self, action, typeId, devId):
+        '''
+        Site Overview
+        Description: Display the site overview data.
+        URL: /site/{siteId}/ overview
+        :return:
+        '''
+        siteId = self.get_siteId(devId)
+        site = self.get_siteId(devId)
+        endpoint = 'site/' + siteId + '/overview'
+        response = requests.get(MY_API_HOST + endpoint)
+        indigo.server.log(str(response))
+        data = response.json()
+        self.update_site(data["overview"], site)
 
     # initializes one node which is registered in Velux
     # runs only when indigo plugin is configured
@@ -205,13 +379,13 @@ class Plugin(indigo.PluginBase):
                 pluginId='jeemzsolaredge',
                 name=site['name'],
                 deviceTypeId='site',
-                props={'deviceId': site['deviceId']},
+                props={'siteId': site['siteId']},
             )
             created_device.updateStateOnServer(site)
         except:
             indigo.server.log("Device already exist. Continue.")
 
-    def init_inverter(self, node):
+    def init_inverter(self, node, siteId):
         indigo.server.log(str(node))
         device = {}
         device['device'] = {}
@@ -219,6 +393,7 @@ class Plugin(indigo.PluginBase):
         device['device']['manufacturer'] = node['manufacturer']
         device['device']['serialNumber'] = node['serialNumber']
         device['device']['model'] = node['model']
+        device['siteId'] = siteId
 
         return device
 
@@ -229,13 +404,13 @@ class Plugin(indigo.PluginBase):
                 pluginId='jeemzsolaredge',
                 name=inverter['name'],
                 deviceTypeId='inverter',
-                props={'deviceId': inverter['deviceId']},
+                props={'serialNumber': inverter['serialNumber']},
             )
             created_device.updateStateOnServer(inverter)
         except:
             indigo.server.log("Device already exist. Continue.")
 
-    def init_battery(self, node):
+    def init_battery(self, node, siteId):
         indigo.server.log(str(node))
         device = {}
         device['device'] = {}
@@ -243,7 +418,7 @@ class Plugin(indigo.PluginBase):
         device['device']['modelNumber'] = node['modelNumber']
         device['device']['serialNumber'] = node['serialNumber']
         device['device']['telemetries'] = node['telemetries']
-
+        device['siteId'] = siteId
         return device
 
     def create_battery_device(self, battery):
@@ -253,7 +428,7 @@ class Plugin(indigo.PluginBase):
                 pluginId='jeemzsolaredge',
                 name=battery['nameplate'],
                 deviceTypeId='battery',
-                props={'deviceId': battery['deviceId']},
+                props={'serialNumber': battery['serialNumber']},
             )
             created_device.updateStateOnServer(battery)
         except:
@@ -261,28 +436,43 @@ class Plugin(indigo.PluginBase):
 
 
     def req_all_sites(self):
+        apikey = self.get_apikey()
         endpoint = 'sites/list?api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         response = requests.get(MY_API_HOST + endpoint)
         return response
 
     def req_all_inverters(self, siteId):
-        endpoint = '/site/'+siteId+'/storageData?api_key='+apikey
-        response = requests.get(MY_API_HOST + endpoint)
-        print(response.json)
-        return response
-
-    def req_all_batteries(self, siteId):
+        apikey = self.get_apikey()
         endpoint = '/equipment/'+siteId+'/list?api_key='+apikey
         response = requests.get(MY_API_HOST + endpoint)
         print(response.json)
         return response
 
-
+    def req_all_batteries(self, siteId, timeUnit = None, time = None):
+        apikey = self.get_apikey()
+        now = datetime.datetime.now()
+        endTime = now.strftime("%d/%m/%Y+%H:%M:%S")
+        if timeUnit or time == None:
+            startTime = now - datetime.timedelta(weeks=1)
+        else:
+            if timeUnit == 'MINUTES':
+                startTime = now - datetime.timedelta(minutes=time)
+            elif timeUnit == 'HOUR':
+                startTime = now - datetime.timedelta(hours=time)
+            elif timeUnit == 'DAY':
+                if time <= 7:
+                    startTime = now - datetime.timedelta(days=time)
+                else:
+                    startTime = now - datetime.timedelta(days=7)
+        startTime = startTime.strftime("%d/%m/%Y+%H:%M:%S")
+        endpoint = '/site/'+siteId+'/storageData' + '?startTime=' + startTime + '&endTime=' + endTime + '&api_key='+apikey
+        response = requests.get(MY_API_HOST + endpoint)
+        print(response.json)
+        return response
 
     # initialize all nodes (blinders) registered with Velux on indigo config of password and ip of Velux
-    def initialize_devices(self, apikey):
-
+    def initialize_devices(self):
         sites = []
         try:
             response = self.req_all_sites()
@@ -308,7 +498,7 @@ class Plugin(indigo.PluginBase):
                 inverters = inverters_json["Sites"]["list"]
                 indigo.server.log(str(inverters))
                 for inverter in inverters:
-                    inverter_device = self.init_inverter(inverter)
+                    inverter_device = self.init_inverter(inverter, siteId)
                     self.create_inverter_device(inverter_device)
 
                 # create batteries of the site
@@ -317,7 +507,7 @@ class Plugin(indigo.PluginBase):
                 batteries = batteries_json["storageData"]["batteries"]
                 indigo.server.log(str(batteries))
                 for battery in batteries:
-                    battery_device = self.init_battery(battery)
+                    battery_device = self.init_battery(battery, siteId)
                     self.create_battery_device(battery_device)
 
         elif len(sites) == 0:
