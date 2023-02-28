@@ -1,6 +1,6 @@
 <PluginConfig>
 
-    <SupportURL>https://github.com/Jeemz-Domotica/indigo-modbus-plugin/</SupportURL>
+    <SupportURL>https://github.com/Jeemz-Domotica/indigo-solaredge-plugin</SupportURL>
     <Title>Connection configuration</Title>
     
     <!-- Define the endpoint URLs instead of port numbers since the connection is done through an API. -->

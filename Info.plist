@@ -19,7 +19,7 @@
 		<dict>
             <!-- TODO: Change this to ngnix when deployment is done -->
 			<key>CFBundleURLName</key>
-			<string>https://github.com/Jeemz-Domotica/indigo-modbus-plugin</string>
+			<string>https://github.com/Jeemz-Domotica/indigo-solaredge-plugin</string>
 		</dict>
 	</array>
 </dict>
