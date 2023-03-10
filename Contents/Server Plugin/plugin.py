@@ -2,15 +2,21 @@ import indigo
 from Queue import Queue
 import requests
 import datetime
+import urllib
 # import pandas as pd
 import csv
+
 # import validation later
+
+apikey = None
 
 MY_API_HOST = 'https://monitoringapi.solaredge.com/'
 
+
 # Here define any functionalities
 def safe_dict_retrieval(struct, field):
-        return struct[field][0] if len(struct[field]) == 1 else struct[field]
+    return struct[field][0] if len(struct[field]) == 1 else struct[field]
+
 
 class Plugin(indigo.PluginBase):
 
@@ -28,21 +34,27 @@ class Plugin(indigo.PluginBase):
     def startup(self):
         indigo.server.log(u"Startup called")
 
-    def runConcurrentThread(self):
+    '''def runConcurrentThread(self):
         try:
             while True:
                 # Do your stuff here
-                indigo.server.log('SOLAREDGE PLUGIN RUNNING')
-                self.sleep(4) # in seconds
         except self.StopThread:
             # do any cleanup here
             pass
+            '''
 
-    
     def closedPrefsConfigUi(self, valuesDict, userCancelled):
         apikey = valuesDict.get('apikey')
+        try:
+            indigo.variable.delete("apikey")
+        except:
+            indigo.server.log("No apikey created yet. Proceeding with creation of apikey.")
+
+        indigo.variable.create("apikey", value=apikey)
+        indigo.server.log(str(apikey))
         # device.ownerProps
         self.initialize_devices()
+
     #     automatically init the sites on the account
 
     # def closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):
@@ -153,7 +165,7 @@ class Plugin(indigo.PluginBase):
     #
     #     return (True, valuesDict)
 
-        # getter for the device id
+    # getter for the device id
 
     def get_serialNumber(self, devId):
         device = indigo.devices[int(devId)]
@@ -172,7 +184,11 @@ class Plugin(indigo.PluginBase):
         return siteId
 
     def get_apikey(self):
-        apikey = indigo.pluginProps.get("apikey")
+        # apikey = indigo.pluginProps.get("apikey")
+        indigo.server.log(str(indigo.variables.__dict__))
+        # Get a variable
+        var = indigo.variables["apikey"]
+        apikey = var.value
         return apikey
 
     def update_inverter(self, newData, inverter):
@@ -191,7 +207,7 @@ class Plugin(indigo.PluginBase):
         :return:
         '''
         apikey = self.get_apikey()
-        endpoint = 'site/'+siteId+'currentPowerFlow?api_key=' + apikey
+        endpoint = 'site/' + siteId + 'currentPowerFlow?api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         response = requests.get(MY_API_HOST + endpoint)
         indigo.server.log(str(response))
@@ -215,7 +231,7 @@ class Plugin(indigo.PluginBase):
         timeUnit = action.props.get('timeUnit')
         time = action.props.get('time')
         now = datetime.datetime.now()
-        endTime = now.strftime("%d/%m/%Y+%H:%M:%S")
+        endTime = now.strftime("%Y-%m-%d%%20%H:%M:%S")
         if timeUnit or time == None:
             startTime = now - datetime.timedelta(weeks=1)
         else:
@@ -228,8 +244,8 @@ class Plugin(indigo.PluginBase):
                     startTime = now - datetime.timedelta(days=time)
                 else:
                     startTime = now - datetime.timedelta(days=7)
-        startTime = startTime.strftime("%d/%m/%Y+%H:%M:%S")
-        endpoint = 'equipment/' + siteId + '/' + inverter_serialNumber + '/data?startTime='+startTime+ '&endTime=' + endTime +'&api_key=' + apikey
+        startTime = startTime.strftime("%Y-%m-%d%%20%H:%M:%S")
+        endpoint = 'equipment/' + siteId + '/' + inverter_serialNumber + '/data?startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         response = requests.get(MY_API_HOST + endpoint)
         indigo.server.log(str(response))
@@ -271,7 +287,6 @@ class Plugin(indigo.PluginBase):
             inverter_serialNumber = inverter.props.get("serialNumber")
             self.update_inverter_data_by_serialNumber(action, inverter_serialNumber)
 
-
     def req_update_all_batteries(self, action, typeId, devId):
         '''
         Calls the request to get all the batteries and updates with the new data the
@@ -300,7 +315,6 @@ class Plugin(indigo.PluginBase):
                 if battery_data["serialNumber"] == battery_device.props.get("serialNumber"):
                     self.update_battery(battery_data, battery_device)
 
-
     def req_site_energy(self, action, typeId, devId):
         '''
         Site Energy - Detailed:
@@ -315,7 +329,7 @@ class Plugin(indigo.PluginBase):
         siteId = self.get_siteId(devId)
         time = action.props.get('time')
         indigo.server.log(str(time))
-        endpoint = 'site/' + siteId + '/energyDetails?timeUnit='+ time +'&api_key=' + apikey
+        endpoint = 'site/' + siteId + '/energyDetails?timeUnit=' + time + '&api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         response = requests.get(MY_API_HOST + endpoint)
         indigo.server.log(str(response))
@@ -341,7 +355,7 @@ class Plugin(indigo.PluginBase):
         timeUnit = action.props.get('timeUnit')
         time = action.props.get('time')
         now = datetime.datetime.now()
-        endTime = now.strftime("%d/%m/%Y+%H:%M:%S")
+        endTime = now.strftime("%Y-%m-%d%%20%H:%M:%S")
         if timeUnit == 'MINUTES':
             startTime = now - datetime.timedelta(minutes=time)
         elif timeUnit == 'HOUR':
@@ -350,7 +364,7 @@ class Plugin(indigo.PluginBase):
             startTime = now - datetime.timedelta(days=time)
         elif timeUnit == 'WEEK':
             startTime = now - datetime.timedelta(weeks=time)
-        startTime = startTime.strftime("%d/%m/%Y+%H:%M:%S")
+        startTime = startTime.strftime("%Y-%m-%d%%20%H:%M:%S")
         endpoint = 'site/' + siteId + '/powerDetails' + '?startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         response = requests.get(MY_API_HOST + endpoint)
@@ -387,12 +401,11 @@ class Plugin(indigo.PluginBase):
         '''
         indigo.server.log(str(node))
         device = {}
-        device['device'] = {}
-        device['device']['name'] = node['name']
-        device['device']['location'] = node['location']
-        device['device']['siteId'] = node['id']
-        device['device']['installationDate'] = node['installationDate']
-
+        device['name'] = node['name']
+        device['location'] = node['location']
+        device['siteId'] = node['id']
+        device['installationDate'] = node['installationDate']
+        indigo.server.log(str(device))
         return device
 
     def create_site_device(self, site):
@@ -401,6 +414,8 @@ class Plugin(indigo.PluginBase):
         :param site:
         :return:
         '''
+        indigo.server.log(str(site))
+        indigo.server.log(str(site['name']).split(' ')[-1])
         try:
             created_device = indigo.device.create(
                 protocol=indigo.kProtocol.Plugin,
@@ -410,8 +425,9 @@ class Plugin(indigo.PluginBase):
                 props={'siteId': site['siteId']},
             )
             created_device.updateStateOnServer(site)
-        except:
+        except Exception as e:
             indigo.server.log("Device already exist. Continue.")
+            indigo.server.log(str(e))
 
     def init_inverter(self, node, siteId):
         '''
@@ -422,11 +438,10 @@ class Plugin(indigo.PluginBase):
         '''
         indigo.server.log(str(node))
         device = {}
-        device['device'] = {}
-        device['device']['name'] = node['name']
-        device['device']['manufacturer'] = node['manufacturer']
-        device['device']['serialNumber'] = node['serialNumber']
-        device['device']['model'] = node['model']
+        device['name'] = node['name']
+        device['manufacturer'] = node['manufacturer']
+        device['serialNumber'] = node['serialNumber']
+        device['model'] = node['model']
         device['siteId'] = siteId
 
         return device
@@ -446,8 +461,9 @@ class Plugin(indigo.PluginBase):
                 props={'serialNumber': inverter['serialNumber']},
             )
             created_device.updateStateOnServer(inverter)
-        except:
+        except Exception as e:
             indigo.server.log("Device already exist. Continue.")
+            indigo.server.log(str(e))
 
     def init_battery(self, node, siteId):
         '''
@@ -458,11 +474,10 @@ class Plugin(indigo.PluginBase):
         '''
         indigo.server.log(str(node))
         device = {}
-        device['device'] = {}
-        device['device']['nameplate'] = node['nameplate']
-        device['device']['modelNumber'] = node['modelNumber']
-        device['device']['serialNumber'] = node['serialNumber']
-        device['device']['telemetries'] = node['telemetries']
+        device['nameplate'] = node['nameplate']
+        device['modelNumber'] = node['modelNumber']
+        device['serialNumber'] = node['serialNumber']
+        device['telemetries'] = node['telemetries']
         device['siteId'] = siteId
         return device
 
@@ -484,7 +499,6 @@ class Plugin(indigo.PluginBase):
         except:
             indigo.server.log("Device already exist. Continue.")
 
-
     def req_all_sites(self):
         '''
         Retrieve all the sites from the api
@@ -503,12 +517,12 @@ class Plugin(indigo.PluginBase):
         :return:
         '''
         apikey = self.get_apikey()
-        endpoint = '/equipment/'+siteId+'/list?api_key='+apikey
+        endpoint = '/equipment/' + str(siteId) + '/list?api_key=' + apikey
         response = requests.get(MY_API_HOST + endpoint)
         print(response.json)
         return response
 
-    def req_all_batteries(self, siteId, timeUnit = None, time = None):
+    def req_all_batteries(self, siteId, timeUnit=None, time=None):
         '''
         Retrieve all the batteries from the api
         :param siteId:
@@ -518,7 +532,7 @@ class Plugin(indigo.PluginBase):
         '''
         apikey = self.get_apikey()
         now = datetime.datetime.now()
-        endTime = now.strftime("%d/%m/%Y+%H:%M:%S")
+        endTime = now.strftime("%Y-%m-%d%%20%H:%M:%S")
         if timeUnit or time == None:
             startTime = now - datetime.timedelta(weeks=1)
         else:
@@ -531,9 +545,15 @@ class Plugin(indigo.PluginBase):
                     startTime = now - datetime.timedelta(days=time)
                 else:
                     startTime = now - datetime.timedelta(days=7)
-        startTime = startTime.strftime("%d/%m/%Y+%H:%M:%S")
-        endpoint = '/site/'+siteId+'/storageData' + '?startTime=' + startTime + '&endTime=' + endTime + '&api_key='+apikey
-        response = requests.get(MY_API_HOST + endpoint)
+        startTime = startTime.strftime("%Y-%m-%d%%20%H:%M:%S")
+        query = {'startTime': startTime, 'endTime': endTime, 'api_key': apikey}
+
+        endpoint = 'site/' + str(siteId) + '/storageData'
+        url = MY_API_HOST + endpoint + '?' + 'startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
+        response = requests.get(url)
+        indigo.server.log("url: ")
+        indigo.server.log(str(response.url))
+        indigo.server.log(str(response.headers))
         print(response.json)
         return response
 
@@ -548,7 +568,7 @@ class Plugin(indigo.PluginBase):
             response = self.req_all_sites()
             sites_json = response.json()
             indigo.server.log(str(sites_json))
-            sites.append(sites_json["Sites"]["list"])
+            sites = sites_json["sites"]["site"]
             indigo.server.log(str(sites))
         except:
             indigo.server.log("Could not reach the SolarEdge server or wrong API key.")
@@ -564,8 +584,10 @@ class Plugin(indigo.PluginBase):
                 # create inverters of the site
                 siteId = device_site['siteId']
                 response = self.req_all_inverters(siteId)
-                inverters_json = response.json()["list"]
-                inverters = inverters_json["Sites"]["list"]
+                indigo.server.log(str(response))
+                inverters_json = response.json()
+                indigo.server.log(str(inverters_json))
+                inverters = inverters_json["reporters"]["list"]
                 indigo.server.log(str(inverters))
                 for inverter in inverters:
                     inverter_device = self.init_inverter(inverter, siteId)
@@ -573,12 +595,17 @@ class Plugin(indigo.PluginBase):
 
                 # create batteries of the site
                 response = self.req_all_batteries(siteId)
+                indigo.server.log(str(response))
                 batteries_json = response.json()
+                indigo.server.log(str(batteries_json))
                 batteries = batteries_json["storageData"]["batteries"]
                 indigo.server.log(str(batteries))
-                for battery in batteries:
-                    battery_device = self.init_battery(battery, siteId)
-                    self.create_battery_device(battery_device)
+                if len(batteries) > 0:
+                    for battery in batteries:
+                        battery_device = self.init_battery(battery, siteId)
+                        self.create_battery_device(battery_device)
+                else:
+                    indigo.server.log("There are no batteries on your account on this site.")
 
         elif len(sites) == 0:
             indigo.server.log("Could not find any device to connect to Velux")

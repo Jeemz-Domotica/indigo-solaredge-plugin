@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Devices>
         <Device type="custom" id="site">
-        <Name>Inverter</Name>
+        <Name>Site</Name>
         <ConfigUI>
             <Field id="siteId" type="textfield">
                 <Label>Site Id: </Label>
