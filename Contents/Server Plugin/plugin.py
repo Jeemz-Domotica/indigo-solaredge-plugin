@@ -496,8 +496,9 @@ class Plugin(indigo.PluginBase):
                 props={'serialNumber': battery['serialNumber']},
             )
             created_device.updateStateOnServer(battery)
-        except:
+        except Exception as e:
             indigo.server.log("Device already exist. Continue.")
+            indigo.server.log(str(e))
 
     def req_all_sites(self):
         '''
