@@ -2,7 +2,7 @@ import indigo
 from Queue import Queue
 import requests
 import datetime
-import pandas as pd
+# import pandas as pd
 import csv
 # import validation later
 
@@ -357,9 +357,9 @@ class Plugin(indigo.PluginBase):
         indigo.server.log(str(response))
         data = response.json()
         indigo.server.log(str(response))
-        df = pd.json_normalize(data["powerDetails"], record_path=['meters'])
-        print(df.head())
-        df.to_csv()
+        # df = pd.json_normalize(data["powerDetails"], record_path=['meters'])
+        # print(df.head())
+        # df.to_csv()
         return response
 
     def req_site_data(self, action, typeId, devId):
