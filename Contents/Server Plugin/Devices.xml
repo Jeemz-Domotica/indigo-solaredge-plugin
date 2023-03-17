@@ -29,6 +29,42 @@
                 <TriggerLabel>SiteId</TriggerLabel>
                 <ControlPageLabel>SiteId</ControlPageLabel>
             </State>
+            <State id = "currentPower">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Current Power</TriggerLabel>
+                <ControlPageLabel>Current Power</ControlPageLabel>
+            </State>
+
+            <State id = "lastDayEnergy">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Last Day Energy</TriggerLabel>
+                <ControlPageLabel>Last Day Energy</ControlPageLabel>
+            </State>
+            <State id = "lastMonthEnergy">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Last Month Energy</TriggerLabel>
+                <ControlPageLabel>Last Month Energy</ControlPageLabel>
+            </State>
+            <State id = "lastUpdateTime">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Last Update Time</TriggerLabel>
+                <ControlPageLabel>Last Update Time</ControlPageLabel>
+            </State>
+            <State id = "lastYearEnergy">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Last Year Energy</TriggerLabel>
+                <ControlPageLabel>Last Year Energy</ControlPageLabel>
+            </State>
+            <State id = "lifetimeEnergy">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Life time Energy</TriggerLabel>
+                <ControlPageLabel>Life Time Energy</ControlPageLabel>
+            </State>
+            <State id = "measuredBy">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Measured By</TriggerLabel>
+                <ControlPageLabel>Measured By</ControlPageLabel>
+            </State>
         </States>
     </Device>
 

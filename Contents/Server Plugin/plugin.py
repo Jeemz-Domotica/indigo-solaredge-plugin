@@ -213,11 +213,8 @@ class Plugin(indigo.PluginBase):
     def update_site(self, newData, site):
         indigo.server.log(str(newData))
         indigo.server.log(str(type(newData)))
-        pluginProps = site.pluginProps
-        pluginProps.update(newData)
-        indigo.server.log(str(pluginProps))
-        for key, value in pluginProps.items():
-            site.updateStateOnServer(key=key, value=value)
+
+        site.updateStateOnServer(key='', value=value)
         # site.replacePluginPropsOnServer(pluginProps)
         indigo.server.log(str(site))
 
@@ -233,7 +230,7 @@ class Plugin(indigo.PluginBase):
         apikey = self.get_apikey()
         indigo.server.log(str(action))
         site = action.props['site']
-        siteId= self.get_siteId(site)
+        siteId = self.get_siteId(site)
         endpoint = 'site/' + str(siteId) + '/currentPowerFlow?api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         response = requests.get(MY_API_HOST + endpoint)
