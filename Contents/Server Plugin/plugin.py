@@ -1,6 +1,7 @@
 import indigo
 from Queue import Queue
 import requests
+import json
 import datetime
 import urllib
 # import pandas as pd
@@ -173,12 +174,18 @@ class Plugin(indigo.PluginBase):
         return device_id
 
     def get_device(self, devId):
-        device = indigo.devices[devId]
+        device = indigo.devices[long(devId)]
         return device
 
     def get_siteId(self, devId):
-        device = indigo.devices[devId]
-        siteId = device.pluginProps.get("siteId")
+        device = indigo.devices[long(devId)]
+        indigo.server.log("device: ")
+        indigo.server.log(str(device))
+        indigo.server.log("states:")
+        indigo.server.log(str(device.states))
+        siteId = device.states.get("siteId")
+        indigo.server.log(str(siteId))
+        siteId = device.pluginProps.get("id")
         if siteId == None:
             siteId = device.states.get("siteId")
         return siteId
@@ -195,19 +202,28 @@ class Plugin(indigo.PluginBase):
         inverter.updateStateOnServer(newData)
 
     def update_site(self, newData, site):
-        site.updateStateOnServer(newData)
+        indigo.server.log(str(newData))
+        indigo.server.log(str(type(newData)))
+        pluginProps = site.pluginProps
+        pluginProps.update(newData)
+        indigo.server.log(str(pluginProps))
+        site.replacePluginPropsOnServer(pluginProps)
+        indigo.server.log(str(site))
 
     def update_battery(self, newData, battery):
         battery.updateStateOnServer(newData)
 
-    def req_site_power_flow(self, siteId):
+    def req_site_power_flow(self, action):
         '''
         API request. Retrieves the power flow
         :param siteId:
         :return:
         '''
         apikey = self.get_apikey()
-        endpoint = 'site/' + siteId + 'currentPowerFlow?api_key=' + apikey
+        indigo.server.log(str(action))
+        site = action.props['site']
+        siteId= self.get_siteId(site)
+        endpoint = 'site/' + str(siteId) + '/currentPowerFlow?api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         response = requests.get(MY_API_HOST + endpoint)
         indigo.server.log(str(response))
@@ -383,12 +399,19 @@ class Plugin(indigo.PluginBase):
         URL: /site/{siteId}/ overview
         :return:
         '''
-        siteId = self.get_siteId(devId)
-        site = self.get_siteId(devId)
-        endpoint = 'site/' + siteId + '/overview'
+        apikey = self.get_apikey()
+        indigo.server.log(str(action))
+        id = action.props.get('site')
+        site = self.get_device(id)
+        siteId = self.get_siteId(id)
+        indigo.server.log("siteId:")
+        indigo.server.log(str(siteId))
+        endpoint = 'site/' + str(siteId) + '/overview?api_key=' + apikey
+        indigo.server.log(MY_API_HOST + endpoint)
         response = requests.get(MY_API_HOST + endpoint)
         indigo.server.log(str(response))
         data = response.json()
+        indigo.server.log(str(data))
         self.update_site(data["overview"], site)
 
     # initializes one node which is registered in Velux
@@ -422,7 +445,7 @@ class Plugin(indigo.PluginBase):
                 pluginId='jeemzsolaredge',
                 name=site['name'],
                 deviceTypeId='site',
-                props={'siteId': site['siteId']},
+                props={'id': site['siteId']},
             )
             created_device.updateStateOnServer(site)
         except Exception as e:
@@ -458,7 +481,7 @@ class Plugin(indigo.PluginBase):
                 pluginId='jeemzsolaredge',
                 name=inverter['name'],
                 deviceTypeId='inverter',
-                props={'serialNumber': inverter['serialNumber']},
+                props={'id': inverter['serialNumber']},
             )
             created_device.updateStateOnServer(inverter)
         except Exception as e:
@@ -493,7 +516,7 @@ class Plugin(indigo.PluginBase):
                 pluginId='jeemzsolaredge',
                 name=battery['nameplate'],
                 deviceTypeId='battery',
-                props={'serialNumber': battery['serialNumber']},
+                props={'id': battery['serialNumber']},
             )
             created_device.updateStateOnServer(battery)
         except Exception as e:
@@ -609,5 +632,5 @@ class Plugin(indigo.PluginBase):
                     indigo.server.log("There are no batteries on your account on this site.")
 
         elif len(sites) == 0:
-            indigo.server.log("Could not find any device to connect to Velux")
+            indigo.server.log("Could not find any device to connect to SolarEdge")
 

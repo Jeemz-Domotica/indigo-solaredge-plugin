@@ -3,8 +3,8 @@
         <Device type="custom" id="site">
         <Name>Site</Name>
         <ConfigUI>
-            <Field id="siteId" type="textfield">
-                <Label>Site Id: </Label>
+            <Field id="id" type="textfield">
+                <Label>SiteId: </Label>
             </Field>
         </ConfigUI>
 
@@ -24,18 +24,28 @@
                 <TriggerLabel>Installation Date</TriggerLabel>
                 <ControlPageLabel>Installation Date</ControlPageLabel>
             </State>
+            <State id = "siteId">
+                <ValueType>String</ValueType>
+                <TriggerLabel>SiteId</TriggerLabel>
+                <ControlPageLabel>SiteId</ControlPageLabel>
+            </State>
         </States>
     </Device>
 
     <Device type="custom" id="inverter">
         <Name>Inverter</Name>
         <ConfigUI>
-            <Field id="serialNumber" type="textfield">
+            <Field id="id" type="textfield">
                 <Label>Serial Number: </Label>
             </Field>
         </ConfigUI>
-        
+
         <States>
+            <State id = "serialNumber">
+                <ValueType>String</ValueType>
+                <TriggerLabel>SerialNumber</TriggerLabel>
+                <ControlPageLabel>SerialNumber</ControlPageLabel>
+            </State>
             <State id="name">
                 <ValueType>String</ValueType>
                 <TriggerLabel>Inverter/SMI name</TriggerLabel>
@@ -62,12 +72,17 @@
     <Device type="custom" id="battery">
         <Name>Battery</Name>
         <ConfigUI>
-            <Field id="serialNumber" type="textfield">
+            <Field id="id" type="textfield">
                 <Label>Serial Number: </Label>
             </Field>
         </ConfigUI>
 
         <States>
+            <State id = "serialNumber">
+                <ValueType>String</ValueType>
+                <TriggerLabel>SerialNumber</TriggerLabel>
+                <ControlPageLabel>SerialNumber</ControlPageLabel>
+            </State>
             <State id="nameplate">
                 <ValueType>Number</ValueType>
                 <TriggerLabel>Nameplate</TriggerLabel>

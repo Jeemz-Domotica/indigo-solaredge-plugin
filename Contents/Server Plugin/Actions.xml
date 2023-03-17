@@ -5,7 +5,7 @@
     <Action id="site-power-flow">
         <Name>Site Power Flow</Name>
         <ConfigUI>
-            <Field id="siteId" type="menu">
+            <Field id="site" type="menu">
                 <Label>Sites List:</Label>
                 <List class="indigo.devices" filter="self.site"/>
             </Field>
@@ -38,7 +38,7 @@
     <Action id="site_energy">
         <Name>Site Energy</Name>
         <ConfigUI>
-            <Field id="siteId" type="menu">
+            <Field id="site" type="menu">
                 <Label>Sites List:</Label>
                 <List class="indigo.devices" filter="self.site"/>
             </Field>
@@ -60,7 +60,7 @@
     <Action id="site_power">
         <Name>Site Power</Name>
         <ConfigUI>
-            <Field id="siteId" type="menu">
+            <Field id="site" type="menu">
                 <Label>Sites List:</Label>
                 <List class="indigo.devices" filter="self.site"/>
             </Field>
@@ -83,7 +83,7 @@
     <Action id="update-batteries">
         <Name>Get all batteries data by site</Name>
         <ConfigUI>
-            <Field id="siteId" type="menu">
+            <Field id="site" type="menu">
                 <Label>Sites List:</Label>
                 <List class="indigo.devices" filter="self.site"/>
             </Field>
@@ -105,7 +105,7 @@
     <Action id="update-inverters">
         <Name>Get all inverters data by site</Name>
         <ConfigUI>
-            <Field id="siteId" type="menu">
+            <Field id="site" type="menu">
                 <Label>Sites List:</Label>
                 <List class="indigo.devices" filter="self.site"/>
             </Field>
@@ -122,6 +122,17 @@
             </Field>
         </ConfigUI>
         <CallbackMethod>req_update_all_inverters</CallbackMethod>
+    </Action>
+
+    <Action id="site_data">
+        <Name>Get All Timeline Data on Site</Name>
+        <ConfigUI>
+            <Field id="site" type="menu">
+                <Label>Sites List:</Label>
+                <List class="indigo.devices" filter="self.site"/>
+            </Field>
+        </ConfigUI>
+        <CallbackMethod>req_site_data</CallbackMethod>
     </Action>
 
 </Actions>
