@@ -169,8 +169,9 @@ class Plugin(indigo.PluginBase):
     # getter for the device id
 
     def get_serialNumber(self, devId):
-        device = indigo.devices[int(devId)]
-        device_id = device.pluginProps["serialNumber"]
+        device = indigo.devices[long(devId)]
+
+        device_id = device.states.get("serialNumber")
         return device_id
 
     def get_device(self, devId):
@@ -199,7 +200,15 @@ class Plugin(indigo.PluginBase):
         return apikey
 
     def update_inverter(self, newData, inverter):
-        inverter.updateStateOnServer(newData)
+        indigo.server.log(str(newData))
+        indigo.server.log(str(type(newData)))
+        pluginProps = inverter.pluginProps
+        pluginProps.update(newData)
+        indigo.server.log(str(pluginProps))
+        for key, value in pluginProps.items():
+            inverter.updateStateOnServer(key=key, value=value)
+        # site.replacePluginPropsOnServer(pluginProps)
+        indigo.server.log(str(inverter))
 
     def update_site(self, newData, site):
         indigo.server.log(str(newData))
@@ -207,7 +216,9 @@ class Plugin(indigo.PluginBase):
         pluginProps = site.pluginProps
         pluginProps.update(newData)
         indigo.server.log(str(pluginProps))
-        site.replacePluginPropsOnServer(pluginProps)
+        for key, value in pluginProps.items():
+            site.updateStateOnServer(key=key, value=value)
+        # site.replacePluginPropsOnServer(pluginProps)
         indigo.server.log(str(site))
 
     def update_battery(self, newData, battery):
@@ -231,7 +242,7 @@ class Plugin(indigo.PluginBase):
         indigo.server.log(str(response))
         return response
 
-    def update_inverter_data_by_serialNumber(self, action, inverter_serialNumber):
+    def update_inverter_data_by_serialNumber(self, action, inverter_serialNumber, inverter, devId):
         '''
         Helpter function. Updates the inverter device with new data by serialNumber
         :param action:
@@ -242,9 +253,10 @@ class Plugin(indigo.PluginBase):
         # URL: /equipment/{siteId} /{serialNumber}/data
         apikey = self.get_apikey()
         indigo.server.log("REQ INVERTER DATA")
-        inverter = self.get_device(int(inverter_serialNumber))
-        siteId = self.get_siteId(int(inverter_serialNumber))
-        timeUnit = action.props.get('timeUnit')
+        siteId = self.get_siteId(long(devId))
+        timeUnit = action.props.get('timeUnit')[0]
+        indigo.server.log('timeunit')
+        indigo.server.log(str(timeUnit))
         time = action.props.get('time')
         now = datetime.datetime.now()
         endTime = now.strftime("%Y-%m-%d%%20%H:%M:%S")
@@ -281,8 +293,12 @@ class Plugin(indigo.PluginBase):
         :param devId:
         :return:
         '''
+        indigo.server.log(str(action))
+        devId = action.props.get('inverter')
+        indigo.server.log(devId)
         inverter_serialNumber = self.get_serialNumber(devId)
-        self.update_inverter_data_by_serialNumber(action, inverter_serialNumber)
+        inverter = self.get_device(devId)
+        self.update_inverter_data_by_serialNumber(action, inverter_serialNumber, inverter, devId)
 
     def req_update_all_inverters(self, action, typeId, devId):
         '''
@@ -300,8 +316,10 @@ class Plugin(indigo.PluginBase):
         inverters_devices = indigo.devices.deviceTypeId['inverter']
         for inverter in inverters_devices:
             #  get devId of the inverter device
-            inverter_serialNumber = inverter.props.get("serialNumber")
-            self.update_inverter_data_by_serialNumber(action, inverter_serialNumber)
+            indigo.server.log(str(inverter))
+            inverter_id = inverter.props.get('id')
+            inverter_serialNumber = self.get_serialNumber(inverter_id)
+            self.update_inverter_data_by_serialNumber(action, inverter_serialNumber, inverter, inverter_id)
 
     def req_update_all_batteries(self, action, typeId, devId):
         '''
@@ -466,6 +484,8 @@ class Plugin(indigo.PluginBase):
         device['serialNumber'] = node['serialNumber']
         device['model'] = node['model']
         device['siteId'] = siteId
+        indigo.server.log('siteId will be created as: ')
+        indigo.server.log(str(device['siteId']))
 
         return device
 
@@ -483,7 +503,11 @@ class Plugin(indigo.PluginBase):
                 deviceTypeId='inverter',
                 props={'id': inverter['serialNumber']},
             )
-            created_device.updateStateOnServer(inverter)
+            indigo.server.log("created inverter with id , now creating states")
+            for key, value in inverter.items():
+                created_device.updateStateOnServer(key=key, value=value)
+            indigo.server.log('created inverter: ')
+            indigo.server.log(str(created_device))
         except Exception as e:
             indigo.server.log("Device already exist. Continue.")
             indigo.server.log(str(e))
@@ -518,7 +542,11 @@ class Plugin(indigo.PluginBase):
                 deviceTypeId='battery',
                 props={'id': battery['serialNumber']},
             )
-            created_device.updateStateOnServer(battery)
+            indigo.server.log("created inverter with id , now creating states")
+            for key, value in battery.items():
+                created_device.updateStateOnServer(key=key, value=value)
+            indigo.server.log('created battery: ')
+            indigo.server.log(str(created_device))
         except Exception as e:
             indigo.server.log("Device already exist. Continue.")
             indigo.server.log(str(e))
