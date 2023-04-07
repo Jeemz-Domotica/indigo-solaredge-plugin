@@ -217,21 +217,18 @@ class Plugin(indigo.PluginBase):
         pluginProps.update(newData)
         indigo.server.log(str(pluginProps))
         site.states["currentPower"] = newData.get('currentPower')
+        site.updateStateOnServer(key='currentPower', value=newData.get('currentPower'))
         if newData.get('lastDayData'):
-            site.states["lastDayEnergy"] = newData.get('lastDayData').get('energy')
-            site.updateStateOnServer(key='lastDayEnergy', value=site.states["lastDayEnergy"])
+            site.updateStateOnServer(key='lastDayEnergy', value=newData.get('lastDayData').get('energy'))
         if newData.get('lastMonthData'):
-            site.states["lastMonthEnergy"] = newData.get('lastMonthData').get('energy')
-            site.updateStateOnServer(key='lastMonthEnergy', value=site.states["lastMonthEnergy"])
+            site.updateStateOnServer(key='lastMonthEnergy', value=newData.get('lastMonthData').get('energy'))
         if newData.get('lastYearData'):
-            site.states["lastYearEnergy"] = newData.get('lastYearData').get('energy')
-            site.updateStateOnServer(key='lastYearEnergy', value=site.states["lastYearEnergy"])
+            site.updateStateOnServer(key='lastYearEnergy', value=newData.get('lastYearData').get('energy'))
         if newData.get('lifeTimeData'):
-            site.states["lifeTimeEnergy"] = newData.get('lifeTimeData').get('energy')
-            site.updateStateOnServer(key='lifeTimeEnergy', value=site.states["lifeTimeEnergy"])
+            site.updateStateOnServer(key='lifeTimeEnergy', value=newData.get('lifeTimeData').get('energy'))
         if newData.get('lastUpdateTime'):
-            site.states["lastUpdateTime"] = newData.get('lastUpdateTime')
-            site.updateStateOnServer(key='lastUpdateTime', value=site.states["lastUpdateTime"])
+            site.updateStateOnServer(key='lastUpdateTime', value=newData.get('lastUpdateTime'))
+            indigo.server.log("updated the state with new data")
         # for key, value in pluginProps.items():
         #     indigo.server.log(str(key))
         #     indigo.server.log(str(value))
