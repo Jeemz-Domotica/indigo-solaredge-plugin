@@ -216,16 +216,29 @@ class Plugin(indigo.PluginBase):
         pluginProps = site.pluginProps
         pluginProps.update(newData)
         indigo.server.log(str(pluginProps))
+        site.states["currentPower"] = newData.get('currentPower')
+        if newData.get('lastDayData'):
+            site.states["lastDayEnergy"] = newData.get('lastDayData').get('energy')
+        if newData.get('lastMonthData'):
+            site.states["lastMonthEnergy"] = newData.get('lastMonthData').get('energy')
+        if newData.get('lastMonthData'):
+            site.states["lastMonthEnergy"] = newData.get('lastMonthData').get('energy')
+        if newData.get('lastYearData'):
+            site.states["lastYearEnergy"] = newData.get('lastYearData').get('energy')
+        if newData.get('lifeTimeData'):
+            site.states["lifeTimeEnergy"] = newData.get('lifeTimeData').get('energy')
+        if newData.get('lastUpdateTime'):
+            site.states["lastUpdateTime"] = newData.get('lastUpdateTime')
+        # for key, value in pluginProps.items():
+        #     indigo.server.log(str(key))
+        #     indigo.server.log(str(value))
+        #     energy_value = value.values()[0]
+        #     indigo.server.log(str(energy_value))
+            # if type(value) == dict:
+            #     indigo.server.log(str(value.values()[0]))
+            #     site.updateStateOnServer(key=key, value=value.values()[0])
+            # site.updateStateOnServer(key=key, value=value)
 
-        for key, value in pluginProps.items():
-            indigo.server.log(str(key))
-            indigo.server.log(str(value))
-            value = value.values()[0]
-            indigo.server.log(str(value))
-            if type(value) == dict:
-                indigo.server.log(str(value.values()[0]))
-                site.updateStateOnServer(key=key, value=value.values()[0])
-            site.updateStateOnServer(key=key, value=value)
         # site.replacePluginPropsOnServer(pluginProps)
         indigo.server.log(str(site))
 

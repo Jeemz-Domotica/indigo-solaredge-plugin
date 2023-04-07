@@ -55,7 +55,7 @@
                 <TriggerLabel>Last Year Energy</TriggerLabel>
                 <ControlPageLabel>Last Year Energy</ControlPageLabel>
             </State>
-            <State id = "lifetimeEnergy">
+            <State id = "lifeTimeEnergy">
                 <ValueType>Number</ValueType>
                 <TriggerLabel>Life time Energy</TriggerLabel>
                 <ControlPageLabel>Life Time Energy</ControlPageLabel>
