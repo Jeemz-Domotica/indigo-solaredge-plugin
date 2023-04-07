@@ -216,18 +216,18 @@ class Plugin(indigo.PluginBase):
         pluginProps = site.pluginProps
         pluginProps.update(newData)
         indigo.server.log(str(pluginProps))
-        site.states["currentPower"] = newData.get('currentPower')
-        site.updateStateOnServer(key='currentPower', value=newData.get('currentPower'))
+        if newData.get('currentPower'):
+            site.updateStateOnServer(key='currentPower', value=float(newData.get('currentPower')))
         if newData.get('lastDayData'):
-            site.updateStateOnServer(key='lastDayEnergy', value=newData.get('lastDayData').get('energy'))
+            site.updateStateOnServer(key='lastDayEnergy', value=float(newData.get('lastDayData').get('energy')))
         if newData.get('lastMonthData'):
-            site.updateStateOnServer(key='lastMonthEnergy', value=newData.get('lastMonthData').get('energy'))
+            site.updateStateOnServer(key='lastMonthEnergy', value=float(newData.get('lastMonthData').get('energy')))
         if newData.get('lastYearData'):
-            site.updateStateOnServer(key='lastYearEnergy', value=newData.get('lastYearData').get('energy'))
+            site.updateStateOnServer(key='lastYearEnergy', value=float(newData.get('lastYearData').get('energy')))
         if newData.get('lifeTimeData'):
-            site.updateStateOnServer(key='lifeTimeEnergy', value=newData.get('lifeTimeData').get('energy'))
+            site.updateStateOnServer(key='lifeTimeEnergy', value=float(newData.get('lifeTimeData').get('energy')))
         if newData.get('lastUpdateTime'):
-            site.updateStateOnServer(key='lastUpdateTime', value=newData.get('lastUpdateTime'))
+            site.updateStateOnServer(key='lastUpdateTime', value=float(newData.get('lastUpdateTime')))
             indigo.server.log("updated the state with new data")
         # for key, value in pluginProps.items():
         #     indigo.server.log(str(key))
