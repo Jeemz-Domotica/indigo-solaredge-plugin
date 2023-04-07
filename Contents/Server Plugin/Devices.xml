@@ -60,11 +60,6 @@
                 <TriggerLabel>Life time Energy</TriggerLabel>
                 <ControlPageLabel>Life Time Energy</ControlPageLabel>
             </State>
-            <State id = "measuredBy">
-                <ValueType>String</ValueType>
-                <TriggerLabel>Measured By</TriggerLabel>
-                <ControlPageLabel>Measured By</ControlPageLabel>
-            </State>
         </States>
     </Device>
 
