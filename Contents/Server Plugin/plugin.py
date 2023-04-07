@@ -217,7 +217,10 @@ class Plugin(indigo.PluginBase):
         pluginProps.update(newData)
         indigo.server.log(str(pluginProps))
         if newData.get('currentPower'):
-            site.updateStateOnServer(key='currentPower', value=float(newData.get('currentPower')))
+            indigo.server.log(str(type(newData.get('currentPower'))))
+            indigo.server.log(str(newData.get('currentPower')))
+
+            site.updateStateOnServer(key='currentPower', value=float(newData.get('currentPower').get('power')))
         if newData.get('lastDayData'):
             site.updateStateOnServer(key='lastDayEnergy', value=float(newData.get('lastDayData').get('energy')))
         if newData.get('lastMonthData'):
@@ -227,7 +230,7 @@ class Plugin(indigo.PluginBase):
         if newData.get('lifeTimeData'):
             site.updateStateOnServer(key='lifeTimeEnergy', value=float(newData.get('lifeTimeData').get('energy')))
         if newData.get('lastUpdateTime'):
-            site.updateStateOnServer(key='lastUpdateTime', value=float(newData.get('lastUpdateTime')))
+            site.updateStateOnServer(key='lastUpdateTime', value=str(newData.get('lastUpdateTime')))
             indigo.server.log("updated the state with new data")
         # for key, value in pluginProps.items():
         #     indigo.server.log(str(key))
@@ -486,7 +489,7 @@ class Plugin(indigo.PluginBase):
                 deviceTypeId='site',
                 props={'id': site['siteId']},
             )
-            created_device.updateStateOnServer(site)
+            created_device.updateStatesOnServer(site)
         except Exception as e:
             indigo.server.log("Device already exist. Continue.")
             indigo.server.log(str(e))
