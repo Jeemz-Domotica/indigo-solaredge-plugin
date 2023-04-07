@@ -240,6 +240,7 @@ class Plugin(indigo.PluginBase):
             # site.updateStateOnServer(key=key, value=value)
 
         # site.replacePluginPropsOnServer(pluginProps)
+        site.replaceOnServer()
         indigo.server.log(str(site))
 
     def update_battery(self, newData, battery):
