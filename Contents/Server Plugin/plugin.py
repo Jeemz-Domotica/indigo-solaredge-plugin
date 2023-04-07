@@ -184,11 +184,16 @@ class Plugin(indigo.PluginBase):
         indigo.server.log(str(device))
         indigo.server.log("states:")
         indigo.server.log(str(device.states))
-        siteId = device.states.get("siteId")
-        indigo.server.log(str(siteId))
         siteId = device.pluginProps.get("id")
-        if siteId == None:
-            siteId = device.states.get("siteId")
+        return siteId
+
+    def get_siteId_from_inverter(self, devId):
+        device = indigo.devices[long(devId)]
+        indigo.server.log("device: ")
+        indigo.server.log(str(device))
+        siteId = device.states.get("siteId")
+        indigo.server.log("site id is : ")
+        indigo.server.log(str(siteId))
         return siteId
 
     def get_apikey(self):
@@ -277,7 +282,7 @@ class Plugin(indigo.PluginBase):
         # URL: /equipment/{siteId} /{serialNumber}/data
         apikey = self.get_apikey()
         indigo.server.log("REQ INVERTER DATA")
-        siteId = self.get_siteId(long(devId))
+        siteId = self.get_siteId_from_inverter(long(devId))
         timeUnit = action.props.get('timeUnit')[0]
         indigo.server.log('timeunit')
         indigo.server.log(str(timeUnit))
@@ -297,7 +302,7 @@ class Plugin(indigo.PluginBase):
                 else:
                     startTime = now - datetime.timedelta(days=7)
         startTime = startTime.strftime("%Y-%m-%d%%20%H:%M:%S")
-        endpoint = 'equipment/' + siteId + '/' + inverter_serialNumber + '/data?startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
+        endpoint = 'equipment/' + str(siteId) + '/' + inverter_serialNumber + '/data?startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         response = requests.get(MY_API_HOST + endpoint)
         indigo.server.log(str(response))
