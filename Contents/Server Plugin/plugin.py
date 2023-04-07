@@ -6,6 +6,7 @@ import datetime
 import urllib
 # import pandas as pd
 import csv
+import matplotlib.pyplot as plt
 
 # import validation later
 
@@ -210,9 +211,47 @@ class Plugin(indigo.PluginBase):
         pluginProps = inverter.pluginProps
         pluginProps.update(newData)
         indigo.server.log(str(pluginProps))
-        for key, value in pluginProps.items():
-            inverter.updateStateOnServer(key=key, value=value)
+        states = inverter.states
+        powers = []
+        dates = []
+        voltages = []
+        temperatures = []
+        energies = []
+        for telemetry in newData:
+            date = telemetry.get("date")
+            print(date)
+            totalActivePower = telemetry.get("totalActivePower")
+            powers.append(float(totalActivePower))
+            dates.append(date)
+            print(str(totalActivePower))
+            dcVoltage = telemetry.get("dcVoltage")
+            voltages.append(dcVoltage)
+            print(str(dcVoltage))
+            totalEnergy = format(telemetry.get("totalEnergy"), '.2f')
+            energies.append(totalEnergy)
+            temperature = telemetry.get("temperature")
+            temperatures.append(temperature)
+
+        print(energies)
+        fig, ax = plt.subplots(4)
+        ax[0].plot(dates, powers)
+        ax[0].set_xticks(ax[0].get_xticks()[::100])
+        ax[0].set_ylabel('totalActivePower')
+        ax[1].plot(dates, voltages)
+        ax[1].set_xticks(ax[1].get_xticks()[::100])
+        ax[1].set_ylabel('dcVoltage')
+        ax[2].plot(dates, energies)
+        ax[2].set_xticks(ax[2].get_xticks()[::100])
+        ax[2].set_yticks([ax[2].get_yticks()[0], ax[2].get_yticks()[-1]])
+        ax[2].set_ylabel('totalEnergy')
+        ax[3].plot(dates, temperatures)
+        ax[3].set_ylabel('Temperature')
+        ax[3].set_xticks(ax[3].get_xticks()[::100])
+        fig.tight_layout()
+        plt.savefig("power.png")
+            # inverter.updateStateOnServer(key=key, value=value)
         # site.replacePluginPropsOnServer(pluginProps)
+        
         indigo.server.log(str(inverter))
 
     def update_site(self, newData, site):
