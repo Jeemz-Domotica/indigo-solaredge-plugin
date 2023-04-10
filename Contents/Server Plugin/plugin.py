@@ -6,6 +6,7 @@ import datetime
 import urllib
 # import pandas as pd
 import csv
+import os
 import matplotlib.pyplot as plt
 
 # import validation later
@@ -248,10 +249,11 @@ class Plugin(indigo.PluginBase):
         ax[3].set_ylabel('Temperature')
         ax[3].set_xticks(ax[3].get_xticks()[::100])
         fig.tight_layout()
-        plt.savefig("power.png")
+        pwd = os.path.join("Library", "Application Support", "Perceptive Automation", "Indigo 2022.2" , "Web Assets","images")
+        plt.savefig(os.path.join ( pwd, "power.png"))
             # inverter.updateStateOnServer(key=key, value=value)
         # site.replacePluginPropsOnServer(pluginProps)
-        
+        # os.path.join(os.getcwd(),
         indigo.server.log(str(inverter))
 
     def update_site(self, newData, site):
