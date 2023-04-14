@@ -470,28 +470,37 @@ class Plugin(indigo.PluginBase):
         '''
         indigo.server.log("REQ SITE ENERGY DATA")
         apikey = self.get_apikey()
-        siteId = self.get_siteId_from_inverter(int(devId))
+
+        indigo.server.log(str(action))
+
+        siteId = self.get_siteId(action.props.get('site'))
         timeUnit = action.props.get('timeUnit')[0]
         indigo.server.log('timeunit')
         indigo.server.log(str(timeUnit))
-        time = action.props.get('time')
+        time = action.props.get('time')[0]
         now = datetime.datetime.now()
         endTime = now.strftime("%Y-%m-%d%%20%H:%M:%S")
         if timeUnit or time == None:
             startTime = now - datetime.timedelta(weeks=1)
         else:
-            if timeUnit == 'MINUTES':
-                startTime = now - datetime.timedelta(minutes=time)
+            if timeUnit == 'QUARTER_OF_AN_HOUR':
+                startTime = now - datetime.timedelta(minutes=time*15)
             elif timeUnit == 'HOUR':
                 startTime = now - datetime.timedelta(hours=time)
             elif timeUnit == 'DAY':
                 if time <= 7:
                     startTime = now - datetime.timedelta(days=time)
                 else:
-                    startTime = now - datetime.timedelta(days=1)
+                    startTime = now - datetime.timedelta(days=7)
+            elif timeUnit == 'WEEK':
+                startTime = now - datetime.timedelta(weeks=time)
+            elif timeUnit == 'MONTH':
+                startTime = now - datetime.timedelta(weeks=time*4)
+            elif timeUnit == 'YEAR':
+                startTime = now - datetime.timedelta(weeks=time*4*12)
         startTime = startTime.strftime("%Y-%m-%d%%20%H:%M:%S")
         indigo.server.log(str(time))
-        endpoint = 'site/' + siteId + '/energyDetails?timeUnit=' + time + '/data?startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
+        endpoint = 'site/' + str(siteId) + '/energyDetails?timeUnit=' + timeUnit + '&startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         # response = requests.get(MY_API_HOST + endpoint)
         arg = MY_API_HOST + endpoint

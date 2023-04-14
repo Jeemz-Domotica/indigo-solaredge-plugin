@@ -42,10 +42,10 @@
                 <Label>Sites List:</Label>
                 <List class="indigo.devices" filter="self.site"/>
             </Field>
-            <Field type="list" id="time">
+            <Field type="list" id="timeUnit">
                 <Label>Time Range</Label>
                     <List>
-                        <Option value="QUARTER_OF_AN_HOUR">QUARTER OF AN HOUR</Option>
+                    <Option value="QUARTER_OF_AN_HOUR">QUARTER OF AN HOUR</Option>
                         <Option value="HOUR">HOUR</Option>
                         <Option value="DAY">DAY</Option>
                         <Option value="WEEK">WEEK</Option>
