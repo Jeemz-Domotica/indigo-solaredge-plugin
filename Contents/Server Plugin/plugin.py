@@ -1,14 +1,14 @@
 import indigo
-from Queue import Queue
 import requests
 import json
 import datetime
-import urllib
 # import pandas as pd
-import csv
 import os
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
-
+import runpy
+import subprocess
 # import validation later
 
 apikey = None
@@ -171,17 +171,17 @@ class Plugin(indigo.PluginBase):
     # getter for the device id
 
     def get_serialNumber(self, devId):
-        device = indigo.devices[long(devId)]
+        device = indigo.devices[int(devId)]
 
         device_id = device.states.get("serialNumber")
         return device_id
 
     def get_device(self, devId):
-        device = indigo.devices[long(devId)]
+        device = indigo.devices[int(devId)]
         return device
 
     def get_siteId(self, devId):
-        device = indigo.devices[long(devId)]
+        device = indigo.devices[int(devId)]
         indigo.server.log("device: ")
         indigo.server.log(str(device))
         indigo.server.log("states:")
@@ -190,7 +190,7 @@ class Plugin(indigo.PluginBase):
         return siteId
 
     def get_siteId_from_inverter(self, devId):
-        device = indigo.devices[long(devId)]
+        device = indigo.devices[int(devId)]
         indigo.server.log("device: ")
         indigo.server.log(str(device))
         siteId = device.states.get("siteId")
@@ -209,10 +209,8 @@ class Plugin(indigo.PluginBase):
     def update_inverter(self, newData, inverter):
         indigo.server.log(str(newData))
         indigo.server.log(str(type(newData)))
-        pluginProps = inverter.pluginProps
-        pluginProps.update(newData)
-        indigo.server.log(str(pluginProps))
         states = inverter.states
+        '''
         powers = []
         dates = []
         voltages = []
@@ -232,28 +230,59 @@ class Plugin(indigo.PluginBase):
             energies.append(totalEnergy)
             temperature = telemetry.get("temperature")
             temperatures.append(temperature)
+        '''
 
-        print(energies)
-        fig, ax = plt.subplots(4)
-        ax[0].plot(dates, powers)
-        ax[0].set_xticks(ax[0].get_xticks()[::100])
-        ax[0].set_ylabel('totalActivePower')
-        ax[1].plot(dates, voltages)
-        ax[1].set_xticks(ax[1].get_xticks()[::100])
-        ax[1].set_ylabel('dcVoltage')
-        ax[2].plot(dates, energies)
-        ax[2].set_xticks(ax[2].get_xticks()[::100])
-        ax[2].set_yticks([ax[2].get_yticks()[0], ax[2].get_yticks()[-1]])
-        ax[2].set_ylabel('totalEnergy')
-        ax[3].plot(dates, temperatures)
-        ax[3].set_ylabel('Temperature')
-        ax[3].set_xticks(ax[3].get_xticks()[::100])
-        fig.tight_layout()
-        pwd = os.path.join("Library", "Application Support", "Perceptive Automation", "Indigo 2022.2" , "Web Assets","images")
-        plt.savefig(os.path.join ( pwd, "power.png"))
+        #runpy.run_path(path_name='sitePowerFlow.py')
+        indigo.server.log("BEFORE PLOTTING")
+       # indigo.server.log(str(os.system("sitePowerFlow.py")))
+        import subprocess
+        cmd = 'python2 sitePowerFlow.py'
+
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        out, err = p.communicate()
+        result = out.split('\n')
+        for lin in result:
+            if not lin.startswith('#'):
+                indigo.server.log(str(lin))
+        indigo.server.log("Ran script")
+        '''
+        try:
+            fig, ax = plt.subplots(4)
+            indigo.server.log("started plotting")
+            ax[0].plot(dates, powers)
+            ax[0].set_xticks(ax[0].get_xticks()[::100])
+            ax[0].set_ylabel('totalActivePower')
+            ax[1].plot(dates, voltages)
+            ax[1].set_xticks(ax[1].get_xticks()[::100])
+            ax[1].set_ylabel('dcVoltage')
+            ax[2].plot(dates, energies)
+            ax[2].set_xticks(ax[2].get_xticks()[::100])
+            ax[2].set_yticks([ax[2].get_yticks()[0], ax[2].get_yticks()[-1]])
+            ax[2].set_ylabel('totalEnergy')
+            ax[3].plot(dates, temperatures)
+            ax[3].set_ylabel('Temperature')
+            ax[3].set_xticks(ax[3].get_xticks()[::100])
+            fig.tight_layout()
+            print(os.getcwd())
+            os.chdir('..')
+            os.chdir('..')
+            os.chdir('..')
+            os.chdir('..')
+            print(os.getcwd())
+            os.chdir('Web Assets')
+            print(os.getcwd())
+            os.chdir('images')
+            print(os.getcwd())
+            os.chdir('controls')
+            os.chdir('static')
+            print(os.getcwd())
+            plt.savefig(os.path.join(os.getcwd(), "power.png"))
+        except Exception as e:
+            indigo.server.log(str(e))
             # inverter.updateStateOnServer(key=key, value=value)
         # site.replacePluginPropsOnServer(pluginProps)
         # os.path.join(os.getcwd(),
+        '''
         indigo.server.log(str(inverter))
 
     def update_site(self, newData, site):
@@ -323,7 +352,7 @@ class Plugin(indigo.PluginBase):
         # URL: /equipment/{siteId} /{serialNumber}/data
         apikey = self.get_apikey()
         indigo.server.log("REQ INVERTER DATA")
-        siteId = self.get_siteId_from_inverter(long(devId))
+        siteId = self.get_siteId_from_inverter(int(devId))
         timeUnit = action.props.get('timeUnit')[0]
         indigo.server.log('timeunit')
         indigo.server.log(str(timeUnit))
