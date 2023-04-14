@@ -493,11 +493,18 @@ class Plugin(indigo.PluginBase):
         indigo.server.log(str(time))
         endpoint = 'site/' + siteId + '/energyDetails?timeUnit=' + time + '/data?startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
-        response = requests.get(MY_API_HOST + endpoint)
-        indigo.server.log(str(response))
-        response = response.json()
-        indigo.server.log(str(response))
-        return response
+        # response = requests.get(MY_API_HOST + endpoint)
+        arg = MY_API_HOST + endpoint
+        cmd = 'python2 siteEnergy.py ' + arg
+        indigo.server.log("COMMAND")
+        indigo.server.log(cmd)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        out, err = p.communicate()
+        result = out.split('\n')
+        for lin in result:
+            if not lin.startswith('#'):
+                indigo.server.log(str(lin))
+        indigo.server.log("Ran script")
 
     def req_site_power(self, action, typeId, devId):
         '''
