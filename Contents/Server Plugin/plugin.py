@@ -210,7 +210,7 @@ class Plugin(indigo.PluginBase):
         indigo.server.log(str(newData))
         indigo.server.log(str(type(newData)))
         states = inverter.states
-        '''
+
         powers = []
         dates = []
         voltages = []
@@ -230,13 +230,13 @@ class Plugin(indigo.PluginBase):
             energies.append(totalEnergy)
             temperature = telemetry.get("temperature")
             temperatures.append(temperature)
-        '''
+
 
         #runpy.run_path(path_name='sitePowerFlow.py')
         indigo.server.log("BEFORE PLOTTING")
        # indigo.server.log(str(os.system("sitePowerFlow.py")))
-        import subprocess
-        cmd = 'python2 sitePowerFlow.py'
+
+        cmd = 'python2 sitePowerFlow.py ' + str()
 
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
         out, err = p.communicate()
@@ -374,15 +374,24 @@ class Plugin(indigo.PluginBase):
         startTime = startTime.strftime("%Y-%m-%d%%20%H:%M:%S")
         endpoint = 'equipment/' + str(siteId) + '/' + inverter_serialNumber + '/data?startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
-        response = requests.get(MY_API_HOST + endpoint)
-        indigo.server.log(str(response))
-        response = response.json()
-        indigo.server.log(str(response))
-        # update states of the inverter with new data
-        newData = response["data"]["telemetries"]
-        self.update_inverter(newData, inverter)
+        # response = requests.get(MY_API_HOST + endpoint)
+        cmd = 'python2 sitePowerFlow.py ' + str(MY_API_HOST + endpoint)
 
-        return response
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        out, err = p.communicate()
+        result = out.split('\n')
+        for lin in result:
+            if not lin.startswith('#'):
+                indigo.server.log(str(lin))
+        indigo.server.log("Ran script")
+        # indigo.server.log(str(response))
+        # response = response.json()
+        # indigo.server.log(str(response))
+        # # update states of the inverter with new data
+        # newData = response["data"]["telemetries"]
+        # self.update_inverter(newData, inverter)
+
+        # return response
 
     def req_inverter_data_by_serialNumber(self, action, typeId, devId):
         '''
@@ -459,10 +468,28 @@ class Plugin(indigo.PluginBase):
         '''
         indigo.server.log("REQ SITE ENERGY DATA")
         apikey = self.get_apikey()
-        siteId = self.get_siteId(devId)
+        siteId = self.get_siteId_from_inverter(int(devId))
+        timeUnit = action.props.get('timeUnit')[0]
+        indigo.server.log('timeunit')
+        indigo.server.log(str(timeUnit))
         time = action.props.get('time')
+        now = datetime.datetime.now()
+        endTime = now.strftime("%Y-%m-%d%%20%H:%M:%S")
+        if timeUnit or time == None:
+            startTime = now - datetime.timedelta(weeks=1)
+        else:
+            if timeUnit == 'MINUTES':
+                startTime = now - datetime.timedelta(minutes=time)
+            elif timeUnit == 'HOUR':
+                startTime = now - datetime.timedelta(hours=time)
+            elif timeUnit == 'DAY':
+                if time <= 7:
+                    startTime = now - datetime.timedelta(days=time)
+                else:
+                    startTime = now - datetime.timedelta(days=1)
+        startTime = startTime.strftime("%Y-%m-%d%%20%H:%M:%S")
         indigo.server.log(str(time))
-        endpoint = 'site/' + siteId + '/energyDetails?timeUnit=' + time + '&api_key=' + apikey
+        endpoint = 'site/' + siteId + '/energyDetails?timeUnit=' + time + '/data?startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         response = requests.get(MY_API_HOST + endpoint)
         indigo.server.log(str(response))

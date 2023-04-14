@@ -53,6 +53,9 @@
                         <Option value="YEAR">YEAR</Option>
                     </List>
                 </Field>
+            <Field id="time" type="textfield">
+                <Label>Time Range for the selected time unit:</Label>
+            </Field>
         </ConfigUI>
         <CallbackMethod>req_site_energy</CallbackMethod>
     </Action>

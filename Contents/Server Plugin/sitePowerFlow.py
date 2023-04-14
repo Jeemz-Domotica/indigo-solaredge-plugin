@@ -1,3 +1,5 @@
+import sys
+
 import requests
 import matplotlib
 matplotlib.use('TkAgg')
@@ -6,8 +8,8 @@ import os
 
 
 import datetime
-MY_API_HOST = 'https://monitoringapi.solaredge.com/'
-apikey = "MGB6NFG5T080XM7UFKK6VMEJLH9VGYOF"
+# MY_API_HOST = 'https://monitoringapi.solaredge.com/'
+# apikey = "MGB6NFG5T080XM7UFKK6VMEJLH9VGYOF"
 
 # endpoint = 'site/149132/currentPowerFlow?api_key=' + apikey
 # response = requests.get(MY_API_HOST + endpoint)
@@ -15,9 +17,10 @@ apikey = "MGB6NFG5T080XM7UFKK6VMEJLH9VGYOF"
 # print(response)
 # print(response.content)
 
-siteId = '149132'
+# siteId = '149132'
 # endpoint = 'equipment/' + str(siteId) + '/list?api_key=' + apikey
-endpoint = 'https://monitoringapi.solaredge.com/equipment/149132/7E19C580-DC/data?startTime=2023-04-06%2015:09:18&endTime=2023-04-07%2015:09:18&api_key=MGB6NFG5T080XM7UFKK6VMEJLH9VGYOF'
+# endpoint = 'https://monitoringapi.solaredge.com/equipment/149132/7E19C580-DC/data?startTime=2023-04-06%2015:09:18&endTime=2023-04-07%2015:09:18&api_key=MGB6NFG5T080XM7UFKK6VMEJLH9VGYOF'
+endpoint = sys.argv[2]
 response = requests.get(endpoint)
 data = response.json()
 print(data)
