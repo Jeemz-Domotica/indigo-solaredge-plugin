@@ -5,6 +5,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import os
+import numpy as np
 
 
 import datetime
@@ -20,7 +21,8 @@ import datetime
 # siteId = '149132'
 # endpoint = 'equipment/' + str(siteId) + '/list?api_key=' + apikey
 # endpoint = 'https://monitoringapi.solaredge.com/equipment/149132/7E19C580-DC/data?startTime=2023-04-06%2015:09:18&endTime=2023-04-07%2015:09:18&api_key=MGB6NFG5T080XM7UFKK6VMEJLH9VGYOF'
-endpoint = sys.argv[2]
+print(sys.argv)
+endpoint = sys.argv[1]
 response = requests.get(endpoint)
 data = response.json()
 print(data)
@@ -32,34 +34,33 @@ temperatures = []
 energies = []
 for telemetry in newData:
     date = telemetry.get("date")
-    print(date)
+
     totalActivePower = telemetry.get("totalActivePower")
     powers.append(float(totalActivePower))
     dates.append(date)
-    print(str(totalActivePower))
+
     dcVoltage = telemetry.get("dcVoltage")
     voltages.append(dcVoltage)
-    print(str(dcVoltage))
+
     totalEnergy = format(telemetry.get("totalEnergy"), '.2f')
     energies.append(totalEnergy)
     temperature = telemetry.get("temperature")
     temperatures.append(temperature)
 
-print(energies)
 fig, ax = plt.subplots(4)
 ax[0].plot(dates, powers)
-ax[0].set_xticks(ax[0].get_xticks()[::100])
+ax[0].set_xticks([ax[0].get_xticks()[0], ax[0].get_xticks()[-1]])
 ax[0].set_ylabel('totalActivePower')
 ax[1].plot(dates, voltages)
-ax[1].set_xticks(ax[1].get_xticks()[::100])
+ax[1].set_xticks([ax[1].get_xticks()[0], ax[1].get_xticks()[-1]])
 ax[1].set_ylabel('dcVoltage')
 ax[2].plot(dates, energies)
-ax[2].set_xticks(ax[2].get_xticks()[::100])
+ax[2].set_xticks([ax[2].get_xticks()[0], ax[2].get_xticks()[-1]])
 ax[2].set_yticks([ax[2].get_yticks()[0], ax[2].get_yticks()[-1]])
 ax[2].set_ylabel('totalEnergy')
 ax[3].plot(dates, temperatures)
 ax[3].set_ylabel('Temperature')
-ax[3].set_xticks(ax[3].get_xticks()[::100])
+ax[3].set_xticks([ax[3].get_xticks()[0], ax[3].get_xticks()[-1]])
 fig.tight_layout()
 pwd = os.path.join("Library", "Application Support", "Perceptive Automation", "Indigo 2022.2", "Web Assets", "images")
 print(os.getcwd())

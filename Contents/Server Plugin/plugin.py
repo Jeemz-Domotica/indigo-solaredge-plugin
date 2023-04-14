@@ -375,8 +375,10 @@ class Plugin(indigo.PluginBase):
         endpoint = 'equipment/' + str(siteId) + '/' + inverter_serialNumber + '/data?startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         # response = requests.get(MY_API_HOST + endpoint)
-        cmd = 'python2 sitePowerFlow.py ' + str(MY_API_HOST + endpoint)
-
+        arg = MY_API_HOST + endpoint
+        cmd = 'python2 sitePowerFlow.py ' + arg
+        indigo.server.log("COMMAND")
+        indigo.server.log(cmd)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
         out, err = p.communicate()
         result = out.split('\n')
