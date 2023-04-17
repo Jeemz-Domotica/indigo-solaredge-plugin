@@ -117,6 +117,7 @@
                 <TriggerLabel>Power Limit</TriggerLabel>
                 <ControlPageLabel>Power Limit</ControlPageLabel>
             </State>
+            
             <State id="totalEnergy">
                 <ValueType>Number</ValueType>
                 <TriggerLabel>Total Energy</TriggerLabel>

@@ -230,6 +230,7 @@ class Plugin(indigo.PluginBase):
         inverter.updateStateOnServer(key="operationMode", value=operationMode)
         indigo.server.log(str(inverter))
 
+
     def update_site(self, newData, site):
         indigo.server.log(str(newData))
         indigo.server.log(str(type(newData)))
