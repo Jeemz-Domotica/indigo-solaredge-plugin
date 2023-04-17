@@ -97,6 +97,7 @@
                 <TriggerLabel>Site Id</TriggerLabel>
                 <ControlPageLabel>Site Id</ControlPageLabel>
             </State>
+
         </States>
     </Device>
 

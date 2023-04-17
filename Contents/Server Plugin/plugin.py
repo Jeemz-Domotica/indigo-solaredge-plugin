@@ -376,10 +376,11 @@ class Plugin(indigo.PluginBase):
         indigo.server.log(str(MY_API_HOST + endpoint))
         # response = requests.get(MY_API_HOST + endpoint)
         arg = MY_API_HOST + endpoint
-        cmd = 'python2 sitePowerFlow.py ' + arg
+        cmd = ["python2", "sitePowerFlow.py", str(arg)]
+
         indigo.server.log("COMMAND")
-        indigo.server.log(cmd)
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        indigo.server.log(str(cmd))
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
         out, err = p.communicate()
         result = out.split('\n')
         for lin in result:
@@ -500,14 +501,15 @@ class Plugin(indigo.PluginBase):
                 startTime = now - datetime.timedelta(weeks=time*4*12)
         startTime = startTime.strftime("%Y-%m-%d%%20%H:%M:%S")
         indigo.server.log(str(time))
-        endpoint = 'site/' + str(siteId) + '/energyDetails?timeUnit=' + timeUnit + '&startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
+        endpoint = "site/" + str(siteId) + "/energyDetails?timeUnit=" + timeUnit + "&startTime=" + startTime + "&endTime=" + endTime + "&api_key=" + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         # response = requests.get(MY_API_HOST + endpoint)
         arg = MY_API_HOST + endpoint
-        cmd = 'python2 siteEnergy.py ' + arg
+        cmd = ["python2", "siteEnergy.py", str(arg)]
+
         indigo.server.log("COMMAND")
-        indigo.server.log(cmd)
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        indigo.server.log(str(cmd))
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
         out, err = p.communicate()
         result = out.split('\n')
         for lin in result:
