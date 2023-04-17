@@ -211,79 +211,28 @@ class Plugin(indigo.PluginBase):
         indigo.server.log(str(type(newData)))
         states = inverter.states
 
-        powers = []
-        dates = []
-        voltages = []
-        temperatures = []
-        energies = []
-        for telemetry in newData:
-            date = telemetry.get("date")
-            print(date)
-            totalActivePower = telemetry.get("totalActivePower")
-            powers.append(float(totalActivePower))
-            dates.append(date)
-            print(str(totalActivePower))
-            dcVoltage = telemetry.get("dcVoltage")
-            voltages.append(dcVoltage)
-            print(str(dcVoltage))
-            totalEnergy = format(telemetry.get("totalEnergy"), '.2f')
-            energies.append(totalEnergy)
-            temperature = telemetry.get("temperature")
-            temperatures.append(temperature)
-
-
-        #runpy.run_path(path_name='sitePowerFlow.py')
-        indigo.server.log("BEFORE PLOTTING")
-       # indigo.server.log(str(os.system("sitePowerFlow.py")))
-
-        cmd = 'python2 sitePowerFlow.py ' + str()
-
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
-        out, err = p.communicate()
-        result = out.split('\n')
-        for lin in result:
-            if not lin.startswith('#'):
-                indigo.server.log(str(lin))
-        indigo.server.log("Ran script")
-        '''
-        try:
-            fig, ax = plt.subplots(4)
-            indigo.server.log("started plotting")
-            ax[0].plot(dates, powers)
-            ax[0].set_xticks(ax[0].get_xticks()[::100])
-            ax[0].set_ylabel('totalActivePower')
-            ax[1].plot(dates, voltages)
-            ax[1].set_xticks(ax[1].get_xticks()[::100])
-            ax[1].set_ylabel('dcVoltage')
-            ax[2].plot(dates, energies)
-            ax[2].set_xticks(ax[2].get_xticks()[::100])
-            ax[2].set_yticks([ax[2].get_yticks()[0], ax[2].get_yticks()[-1]])
-            ax[2].set_ylabel('totalEnergy')
-            ax[3].plot(dates, temperatures)
-            ax[3].set_ylabel('Temperature')
-            ax[3].set_xticks(ax[3].get_xticks()[::100])
-            fig.tight_layout()
-            print(os.getcwd())
-            os.chdir('..')
-            os.chdir('..')
-            os.chdir('..')
-            os.chdir('..')
-            print(os.getcwd())
-            os.chdir('Web Assets')
-            print(os.getcwd())
-            os.chdir('images')
-            print(os.getcwd())
-            os.chdir('controls')
-            os.chdir('static')
-            print(os.getcwd())
-            plt.savefig(os.path.join(os.getcwd(), "power.png"))
-        except Exception as e:
-            indigo.server.log(str(e))
-            # inverter.updateStateOnServer(key=key, value=value)
-        # site.replacePluginPropsOnServer(pluginProps)
-        # os.path.join(os.getcwd(),
-        '''
+        if len(newData) > 0:
+            last_telemetry = newData[-1]
+            date = last_telemetry.get("date")
+            inverter.updateStateOnServer(key="date", value=date)
+            totalActivePower = format(last_telemetry.get("totalActivePower"), '.2f')
+            inverter.updateStateOnServer(key="totalActivePower", value=totalActivePower)
+            dcVoltage = last_telemetry.get("dcVoltage")
+            inverter.updateStateOnServer(key="dcVoltage", value=dcVoltage)
+            powerLimit = last_telemetry.get("powerLimit")
+            inverter.updateStateOnServer(key="powerLimit", value=powerLimit)
+            totalEnergy = format(last_telemetry.get("totalEnergy"), '.2f')
+            inverter.updateStateOnServer(key="totalEnergy", value=totalEnergy)
+            temperature = last_telemetry.get("temperature")
+            inverter.updateStateOnServer(key="temperature", value=temperature)
+            inverterMode = last_telemetry.get("inverterMode")
+            inverter.updateStateOnServer(key="inverterMode", value=inverterMode)
+            operationMode = last_telemetry.get("operationMode")
+            inverter.updateStateOnServer(key="operationMode", value=operationMode)
+        else:
+            indigo.server.log(str(newData))
         indigo.server.log(str(inverter))
+
 
     def update_site(self, newData, site):
         indigo.server.log(str(newData))
@@ -376,8 +325,18 @@ class Plugin(indigo.PluginBase):
         indigo.server.log(str(MY_API_HOST + endpoint))
         # response = requests.get(MY_API_HOST + endpoint)
         arg = MY_API_HOST + endpoint
-        cmd = ["python2", "sitePowerFlow.py", str(arg)]
+        cmd = ["python2", "sitePowerFlow.py", str(arg), str(inverter_serialNumber)]
 
+
+        # send request for saving last timestep data to state
+        response = requests.get(arg)
+        data = response.json()
+        print(data)
+        newData = data["data"]["telemetries"]
+        self.update_inverter(newData, inverter)
+
+
+        # send request to script for plotting
         indigo.server.log("COMMAND")
         indigo.server.log(str(cmd))
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)

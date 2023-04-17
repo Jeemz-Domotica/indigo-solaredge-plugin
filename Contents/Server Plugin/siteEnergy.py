@@ -11,6 +11,7 @@ import os
 
 print(sys.argv)
 endpoint = sys.argv[1]
+inverter_serialNumber = sys.argv[2]
 response = requests.get(endpoint)
 data = response.json()
 print(data)
@@ -73,5 +74,5 @@ print(os.getcwd())
 os.chdir('controls')
 os.chdir('static')
 print(os.getcwd())
-plt.savefig(os.path.join(os.getcwd(), "energy.png"))
+plt.savefig(os.path.join(os.getcwd(), "energy-"+inverter_serialNumber+".png"))
 
