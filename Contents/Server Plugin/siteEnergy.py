@@ -11,7 +11,6 @@ from datetime import datetime
 
 print(sys.argv)
 endpoint = sys.argv[1]
-inverter_serialNumber = sys.argv[2]
 response = requests.get(endpoint)
 data = response.json()
 print(data)
@@ -23,13 +22,12 @@ types={}
 try :
     for idx, telemetry in enumerate(newData):
         type = telemetry.get("type").encode('utf-8')
-        print("type : ", type)
+
         types[type] = {}
         types[type]['dates'] = []
         types[type]['values'] = []
         for meterTelemetry in telemetry.get("values"):
-            if type == "FeedIn":
-                print("meterTelemetry: ", meterTelemetry)
+
             date = meterTelemetry.get("date")
             date = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
 
@@ -41,18 +39,15 @@ try :
 
                 #ax[idx].plot(date, value)
     # print(types)
-    print(types['FeedIn'])
-    print(len(types.keys()))
-    print(types.keys())
 
-    fig, ax = plt.subplots(len(types.keys()))
+    fig, ax = plt.subplots(len(types.keys()), squeeze=False )
     idx = 0
     for type in types.keys():
-        print("key: " + type)
-        ax[idx].plot(types[type].get('dates'), types[type].get('values'))
-        ax[idx].set_xticks([ax[idx].get_xticks()[0], ax[idx].get_xticks()[-1]])
-        ax[idx].set_yticks([ax[idx].get_yticks()[0], ax[idx].get_yticks()[-1]])
-        ax[idx].set_ylabel(type)
+
+        ax[idx, idx].plot(types[type].get('dates'), types[type].get('values'))
+        ax[idx, idx].set_xticks([ax[idx, idx].get_xticks()[0], ax[idx, idx].get_xticks()[-1]])
+        ax[idx, idx].set_yticks([ax[idx, idx].get_yticks()[0], ax[idx, idx].get_yticks()[-1]])
+        ax[idx, idx].set_ylabel(type)
         idx = idx + 1
 
         # ax[idx].set_xticks([ax[idx].get_xticks()[0], ax[idx].get_xticks()[-1]])
@@ -76,7 +71,7 @@ try :
     os.chdir('controls')
     os.chdir('static')
     print(os.getcwd())
-    plt.savefig(os.path.join(os.getcwd(), "energy-"+inverter_serialNumber+".png"))
+    plt.savefig(os.path.join(os.getcwd(), "energy.png"))
 
 except Exception as e:
     print(e)
