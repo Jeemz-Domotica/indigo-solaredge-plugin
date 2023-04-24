@@ -379,15 +379,23 @@ class Plugin(indigo.PluginBase):
         :param devId:
         :return:
         '''
-        siteId = self.get_siteId(int(devId))
+        indigo.server.log(str(devId))
+        indigo.server.log(str(action))
         # define timeunit and time
         # for each inverter device
         #  gets the new inverter timeseries data
-        inverters_devices = indigo.devices.deviceTypeId['inverter']
+        indigo.server.log(str(list(indigo.devices)))
+        devices = indigo.devices
+        inverters_devices = []
+        for device in devices:
+            indigo.server.log(str(device.deviceTypeId))
+            if device.deviceTypeId == 'inverter':
+                inverters_devices.append(device)
+
         for inverter in inverters_devices:
             #  get devId of the inverter device
             indigo.server.log(str(inverter))
-            inverter_id = inverter.props.get('id')
+            inverter_id = int(inverter.id)
             inverter_serialNumber = self.get_serialNumber(inverter_id)
             self.update_inverter_data_by_serialNumber(action, inverter_serialNumber, inverter, inverter_id)
 
