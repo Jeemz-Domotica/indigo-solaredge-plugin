@@ -3,11 +3,6 @@
     <SupportURL>https://github.com/Jeemz-Domotica/indigo-solaredge-plugin</SupportURL>
     <Title>Connection configuration</Title>
     
-    <!-- Define the endpoint URLs instead of port numbers since the connection is done through an API. -->
-    <!-- http://localhost:PORT -->
-
-    <!-- stores preferences for next session in
-    /Library/Application Support/Perceptive Automation/Indigo 2022.1/Preferences/Plugins/HoneywellFrontend -->
 
     <Field id="apikey"
            type="textfield"
