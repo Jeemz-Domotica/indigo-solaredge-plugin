@@ -58,117 +58,6 @@ class Plugin(indigo.PluginBase):
         # device.ownerProps
         self.initialize_devices()
 
-    #     automatically init the sites on the account
-
-    # def closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):
-    #     """
-    #     Called when device config is closed, used for saving states.
-    #     :param valuesDict: indigo.Dict containing the key-value pairs of the menu items, as specified in Devices.xml
-    #     :param userCancelled: Boolean telling if the menu was saved by user or not.
-    #     :param typeId: device type identifier, as specified in Devices.xml
-    #     :param devId: device id, unique per device.
-    #     :return: True
-    #     """
-    #     indigo.server.log(str(valuesDict.get('deviceId', "")))
-    #     device = indigo.devices[devId]
-    #     indigo.server.log("VERIFY STATE IN CONFIG UI CLOSED %s" % valuesDict)
-    #     if not userCancelled and typeId == 'myThermostat':
-    #         device = indigo.devices[devId]
-    #         thermostat_id = safe_dict_retrieval(valuesDict, 'deviceId')
-    #         indigo.server.log("thermostat id %s" % thermostat_id )
-    #
-    #         # Update device in the environment
-    #         props_copy = device.pluginProps
-    #         indigo.server.log("PROPS COPY")
-    #         indigo.server.log(str(props_copy))
-    #         indigo.server.log("props copy before deviceId %s" % props_copy['deviceId'] )
-    #         props_copy['deviceId'] = thermostat_id
-    #         indigo.server.log("props copy after deviceId %s" % props_copy['deviceId'] )
-    #         device.replacePluginPropsOnServer(props_copy)
-    #
-    #         # Update device states on Server - triggers deviceUpdated() method
-    #         # device.updateStateOnServer(states_copy)
-    #
-    #
-    #     return True
-
-    # def validateActionConfigUi(self, valuesDict, typeId, deviceId):
-    #     """
-    #     Callback for validating the saved preferences in Action dialog
-    #     :param typeId - action type specified in the type attribute
-    #     :param deviceId - the unique device ID for the device the user selected for the action if you specify a deviceFilter
-    #     :param valuesDict - the dictionary of values currently specified in the dialog
-    #     """
-    #     if typeId == 'httpRequest':  # Validation for httpRequest custom action
-    #         try:
-    #             indigo.server.log(valuesDict.get('thermostatList'))
-    #             indigo.server.log("temptCool is %s" % valuesDict.get('temperatureCool'))
-    #             indigo.server.log("temptHeat is %s" % valuesDict.get('temperatureHeat'))
-    #             assert int(valuesDict['temperatureCool']) in range(int(valuesDict.get('temperatureHeat')), 40)
-    #             assert int(valuesDict['temperatureHeat']) in range(0, int(valuesDict.get('temperatureCool')))
-    #
-    #         except (ValueError, AssertionError) as e:
-    #             errors = indigo.Dict()
-    #             errors['httpRequest'] = "Action for request must be one of the two options"
-    #
-    #             indigo.server.log(errors)
-    #
-    #             return False, valuesDict, errors
-    #
-    #     return True
-
-    # def closedActionConfigUi(self, valuesDict, userCancelled, typeId, actionId):
-    #     """
-    #     Callback for updating the stat eof Aciton after validating the data and closing the dialog
-    #     """
-    #     indigo.server.log(str("closedAction valuesDict %s" % valuesDict))
-    #     indigo.server.log(str("closedAction actionID %s" % actionId))
-    #     indigo.server.log(str("closedAction typeId %s" % typeId))
-    #     device = indigo.devices[int(valuesDict['thermostatList'])]
-    #     indigo.server.log("SELECTED DEVICE %s " % device)
-    #
-    #     indigo.server.log('Dict length: ' + str(len(device.pluginProps.keys())))
-    #     for key in device.pluginProps.keys():
-    #         indigo.server.log(key + " - " + str(device.pluginProps[key]))
-    #     for key in device.states.keys():
-    #         indigo.server.log(key + " - " + str(device.states[key]))
-    #
-    #     if not userCancelled and typeId == 'httpRequest' and str(valuesDict['httpMethod'][0]) == 'crudFan':
-    #         POSTdevicefan = valuesDict['POSTdevicefan']
-    #         indigo.server.log("Fan Settings Mode%s" % POSTdevicefan )
-    #
-    #         # Update device in the environment
-    #         states_copy = device.states
-    #         indigo.server.log("STATES COPY")
-    #         indigo.server.log(str(states_copy))
-    #         indigo.server.log("states copy before change %s" % states_copy['mode.off'] )
-    #         states_copy['mode.off'] = POSTdevicefan
-    #         indigo.server.log("states copy after deviceId %s" % states_copy['mode.off'] )
-    #
-    #         device.updateStateOnServer('mode.off', states_copy['mode.off'])
-    #
-    #     if not userCancelled and typeId == 'httpRequest' and str(valuesDict['httpMethod'][0]) == 'crudThermostat':
-    #         POSTtempCool = valuesDict['POSTtemperatureCool']
-    #         indigo.server.log("Post temp cool  to change to %s " % POSTtempCool)
-    #         POSTtempHeat = valuesDict['POSTtemperatureHeat']
-    #
-    #         # Update device in the environment
-    #         states_copy = device.states
-    #         indigo.server.log("Post temp cool  nefore change in device %s " % states_copy['coolSetPoint'])
-    #
-    #         indigo.server.log(str(states_copy))
-    #         states_copy['coolSetPoint'] = POSTtempCool
-    #
-    #         states_copy['heatSetPoint'] = POSTtempHeat
-    #
-    #         device.updateStateOnServer('coolSetPoint', states_copy['coolSetPoint'])
-    #         device.updateStateOnServer('heatSetPoint', states_copy['heatSetPoint'])
-    #         indigo.server.log("now state cool temp poitn is %s " % device.states['coolSetPoint'])
-    #
-    #
-    #     return (True, valuesDict)
-
-    # getter for the device id
 
     def get_serialNumber(self, devId):
         device = indigo.devices[int(devId)]
@@ -256,17 +145,7 @@ class Plugin(indigo.PluginBase):
         if newData.get('lastUpdateTime'):
             site.updateStateOnServer(key='lastUpdateTime', value=str(newData.get('lastUpdateTime')))
             indigo.server.log("updated the state with new data")
-        # for key, value in pluginProps.items():
-        #     indigo.server.log(str(key))
-        #     indigo.server.log(str(value))
-        #     energy_value = value.values()[0]
-        #     indigo.server.log(str(energy_value))
-            # if type(value) == dict:
-            #     indigo.server.log(str(value.values()[0]))
-            #     site.updateStateOnServer(key=key, value=value.values()[0])
-            # site.updateStateOnServer(key=key, value=value)
-
-        # site.replacePluginPropsOnServer(pluginProps)
+        
         indigo.server.log(str(site))
 
     def update_battery(self, newData, battery):
