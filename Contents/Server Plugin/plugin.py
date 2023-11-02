@@ -4,11 +4,13 @@ import json
 import datetime
 # import pandas as pd
 import os
-import matplotlib
-matplotlib.use('TkAgg')
+# import matplotlib
+
+# matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import runpy
 import subprocess
+
 # import validation later
 
 apikey = None
@@ -57,7 +59,6 @@ class Plugin(indigo.PluginBase):
         indigo.server.log(str(apikey))
         # device.ownerProps
         self.initialize_devices()
-
 
     def get_serialNumber(self, devId):
         device = indigo.devices[int(devId)]
@@ -122,7 +123,6 @@ class Plugin(indigo.PluginBase):
             indigo.server.log(str(newData))
         indigo.server.log(str(inverter))
 
-
     def update_site(self, newData, site):
         indigo.server.log(str(newData))
         indigo.server.log(str(type(newData)))
@@ -145,7 +145,7 @@ class Plugin(indigo.PluginBase):
         if newData.get('lastUpdateTime'):
             site.updateStateOnServer(key='lastUpdateTime', value=str(newData.get('lastUpdateTime')))
             indigo.server.log("updated the state with new data")
-        
+
         indigo.server.log(str(site))
 
     def update_battery(self, newData, battery):
@@ -160,7 +160,7 @@ class Plugin(indigo.PluginBase):
         apikey = self.get_apikey()
         indigo.server.log(str(action))
         site = action.props['site']
-        siteId= self.get_siteId(site)
+        siteId = self.get_siteId(site)
         endpoint = 'site/' + str(siteId) + '/currentPowerFlow?api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         response = requests.get(MY_API_HOST + endpoint)
@@ -200,12 +200,12 @@ class Plugin(indigo.PluginBase):
                 else:
                     startTime = now - datetime.timedelta(days=7)
         startTime = startTime.strftime("%Y-%m-%d%%20%H:%M:%S")
-        endpoint = 'equipment/' + str(siteId) + '/' + inverter_serialNumber + '/data?startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
+        endpoint = 'equipment/' + str(
+            siteId) + '/' + inverter_serialNumber + '/data?startTime=' + startTime + '&endTime=' + endTime + '&api_key=' + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         # response = requests.get(MY_API_HOST + endpoint)
         arg = MY_API_HOST + endpoint
-        cmd = ["python2", "sitePowerFlow.py", str(arg), str(inverter_serialNumber)]
-
+        # cmd = ["python2", "sitePowerFlow.py", str(arg), str(inverter_serialNumber)]
 
         # send request for saving last timestep data to state
         response = requests.get(arg)
@@ -214,17 +214,16 @@ class Plugin(indigo.PluginBase):
         newData = data["data"]["telemetries"]
         self.update_inverter(newData, inverter)
 
-
         # send request to script for plotting
         indigo.server.log("COMMAND")
-        indigo.server.log(str(cmd))
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
-        out, err = p.communicate()
-        result = out.split('\n')
-        for lin in result:
-            if not lin.startswith('#'):
-                indigo.server.log(str(lin))
-        indigo.server.log("Ran script")
+        # indigo.server.log(str(cmd))
+        # p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
+        # out, err = p.communicate()
+        # result = out.split('\n')
+        # for lin in result:
+        #     if not lin.startswith('#'):
+        #         indigo.server.log(str(lin))
+        # indigo.server.log("Ran script")
         # indigo.server.log(str(response))
         # response = response.json()
         # indigo.server.log(str(response))
@@ -331,7 +330,7 @@ class Plugin(indigo.PluginBase):
             startTime = now - datetime.timedelta(weeks=1)
         else:
             if timeUnit == 'QUARTER_OF_AN_HOUR':
-                startTime = now - datetime.timedelta(minutes=time*15)
+                startTime = now - datetime.timedelta(minutes=time * 15)
             elif timeUnit == 'HOUR':
                 startTime = now - datetime.timedelta(hours=time)
             elif timeUnit == 'DAY':
@@ -342,26 +341,27 @@ class Plugin(indigo.PluginBase):
             elif timeUnit == 'WEEK':
                 startTime = now - datetime.timedelta(weeks=time)
             elif timeUnit == 'MONTH':
-                startTime = now - datetime.timedelta(weeks=time*4)
+                startTime = now - datetime.timedelta(weeks=time * 4)
             elif timeUnit == 'YEAR':
-                startTime = now - datetime.timedelta(weeks=time*4*12)
+                startTime = now - datetime.timedelta(weeks=time * 4 * 12)
         startTime = startTime.strftime("%Y-%m-%d%%20%H:%M:%S")
         indigo.server.log(str(time))
-        endpoint = "site/" + str(siteId) + "/energyDetails?timeUnit=" + timeUnit + "&startTime=" + startTime + "&endTime=" + endTime + "&api_key=" + apikey
+        endpoint = "site/" + str(
+            siteId) + "/energyDetails?timeUnit=" + timeUnit + "&startTime=" + startTime + "&endTime=" + endTime + "&api_key=" + apikey
         indigo.server.log(str(MY_API_HOST + endpoint))
         # response = requests.get(MY_API_HOST + endpoint)
         arg = MY_API_HOST + endpoint
-        cmd = ["python2", "siteEnergy.py", str(arg)]
-
-        indigo.server.log("COMMAND")
-        indigo.server.log(str(cmd))
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
-        out, err = p.communicate()
-        result = out.split('\n')
-        for lin in result:
-            if not lin.startswith('#'):
-                indigo.server.log(str(lin))
-        indigo.server.log("Ran script")
+        # cmd = ["python2", "siteEnergy.py", str(arg)]
+        #
+        # indigo.server.log("COMMAND")
+        # indigo.server.log(str(cmd))
+        # p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
+        # out, err = p.communicate()
+        # result = out.split('\n')
+        # for lin in result:
+        #     if not lin.startswith('#'):
+        #         indigo.server.log(str(lin))
+        # indigo.server.log("Ran script")
 
     def req_site_power(self, action, typeId, devId):
         '''
