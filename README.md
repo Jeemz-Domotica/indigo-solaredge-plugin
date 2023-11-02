@@ -1,4 +1,6 @@
 # indigo-solaredge-plugin
+
+THIS BRANCH IS FOR PYTHON2. PLEASE GO TO THE PYTHON3 BRANCH FOR THE PYTHON3 VERSION OF THE PLUGIN.
 ## Installation:
 1. Download and install Indigo
 2. Download the .zip of this repository (green 'code' button)
